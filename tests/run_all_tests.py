@@ -13,6 +13,7 @@ from tests.test_comparacao_simuladores import executar_teste_comparacao_simulado
 from tests.test_transicao_temporal import executar_teste_transicao_temporal
 from tests.test_distribuicoes import executar_teste_distribuicoes
 from tests.test_robustez_estatistica import executar_teste_robustez
+from tests.test_estocasticidade_parametros import executar_teste_estocasticidade_parametros
 
 
 def main():
@@ -28,6 +29,7 @@ def main():
             "convergencia_dt",
             "convergencia_N",
             "estocasticidade",
+            "estocasticidade_parametros",
             "estatisticas_temporais",
             "difusao",
             "comparacao",
@@ -55,6 +57,9 @@ def main():
 
     if args.teste in ["todos", "estocasticidade"]:
         executar_teste_estocasticidade(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
+
+    if args.teste in ["todos", "estocasticidade_parametros"]:
+        executar_teste_estocasticidade_parametros(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
 
     if args.teste in ["todos", "estatisticas_temporais"]:
         executar_teste_estatisticas_temporais(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)

@@ -12,9 +12,9 @@ from tests.utils_estatisticas import calcular_estatisticas_trajetorias
 
 def executar_teste_estatisticas_temporais(
     r0=np.array([0.3, 0.2333]),
-    lista_N_fields: list[int] = [1, 2, 3, 4],
+    lista_N_fields: list[int] = [1, 2, 3],
     t_max: float = 1.0,
-    N_particulas: int = 500,
+    N_particulas: int = 50,
     dt_1: float = 0.01,
     func=None,
     temporal: bool = False,

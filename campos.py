@@ -123,46 +123,73 @@ def campo_total_podado(
     xp: np.ndarray | float,
     yp: np.ndarray | float,
     t: float,
-    n_max: int = 3
+    n_max: int = 3,
+    c: float = c_padrao,
+    alpha: float = alpha_padrao
 ) -> tuple[np.ndarray, np.ndarray]:
     """
-    Soma contribuições apenas dos centros
-    encontrados por verificar().
+    Soma contribuições apenas dos centros ativos na árvore podada.
+    Permite passar opcionalmente os parâmetros c e alpha.
     """
-    xp=np.atleast_1d(xp)
-    yp=np.atleast_1d(yp)
-    # centro raiz n=1
-    x0,y0 = 0.0,0.0
-    Np = len(xp)
-    # árvore podada
-    centros = fc.verificar_vet(
-        n_max,
-        xp,yp,
-        t,
-        x0,y0
-    )
+    xp_arr = np.atleast_1d(xp)
+    yp_arr = np.atleast_1d(yp)
+    Np = len(xp_arr)
+    x0, y0 = 0.0, 0.0
 
-    vx_total=0.0
-    vy_total=0.0
+    # Nível 1 (raiz)
+    vx_total, vy_total = campo_2(xp_arr, yp_arr, x0, y0, t, 1, c=c, alpha=alpha)
 
+    if n_max > 1:
+        centros_x = [np.array([x0]) for _ in range(Np)]
+        centros_y = [np.array([y0]) for _ in range(Np)]
 
-    # nível 1 (raiz)
-    vx,vy = campo_2(
-        xp,yp,
-        x0,y0,
-        t,
-        1
-    )
+        for n in range(1, n_max):
+            R_cut2 = (fc.R_cufoff(n + 1, alpha))**2
+            inv_R_cut2 = 1.0 / R_cut2
+            fator_poten = 2.0 * np.pi / fc.T(n + 1)
 
-    vx_total += vx
-    vy_total += vy
+            sub_cx_base, sub_cy_base = fc.subcentro(n, 0.0, 0.0, t)
 
-    for n in range(2, n_max +1):
-        for j in range(Np):
-            for cx, cy in centros[n-1][j]:
-                vx, vy = campo_2(xp[j], yp[j], cx, cy, t, n)
-                vx_total[j] += vx 
-                vy_total[j] += vy 
+            novos_x = []
+            novos_y = []
+
+            for p in range(Np):
+                cx = centros_x[p]
+                cy = centros_y[p]
+                if len(cx) == 0:
+                    novos_x.append(np.empty(0))
+                    novos_y.append(np.empty(0))
+                    continue
+
+                scx = (cx[:, None] + sub_cx_base[None, :]).ravel()
+                scy = (cy[:, None] + sub_cy_base[None, :]).ravel()
+
+                dx = xp_arr[p] - scx
+                dy = yp_arr[p] - scy
+                r2 = dx*dx + dy*dy
+                mask = r2 < R_cut2
+
+                if np.any(mask):
+                    scx_m = scx[mask]
+                    scy_m = scy[mask]
+                    novos_x.append(scx_m)
+                    novos_y.append(scy_m)
+
+                    dx_m = dx[mask]
+                    dy_m = dy[mask]
+                    r2_m = r2[mask]
+                    poten = fator_poten * np.exp(c / ((r2_m * inv_R_cut2) - 1.0))
+                    vx_total[p] += np.sum(-dy_m * poten)
+                    vy_total[p] += np.sum(dx_m * poten)
+                else:
+                    novos_x.append(np.empty(0))
+                    novos_y.append(np.empty(0))
+
+            centros_x = novos_x
+            centros_y = novos_y
+
+    if np.isscalar(xp) and np.isscalar(yp):
+        return float(vx_total[0]), float(vy_total[0])
     return vx_total, vy_total
 
 
