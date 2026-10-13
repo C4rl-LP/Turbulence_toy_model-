@@ -2,7 +2,7 @@ Características
 
 R_1 = 1, T_1 = 1, lambda = 1.5874010519681994
 alpha de corte = 1.5811388300841898, Fator c = 0.6
-r_0 = [0.3, 0.2333], Número de partículas: 300
+r_0 = [0.3, 0.2333], Número de partículas: 1000
 Tempo total (t_max): 1.0
 Dinâmica: determinística (solve_RK4 via it.simular_particulas)
 Condição inicial: disco uniforme de raio delta_r_n = ||r0|| * R(n)
@@ -10,26 +10,34 @@ Condição inicial: disco uniforme de raio delta_r_n = ||r0|| * R(n)
 Estatísticas:
 
 Nível: 1, delta_r_n = 3.800380e-01, Tamanho da nuvem inicial (L) = 3.800380e-02
-Média: [-0.2627644  -0.27507657], Variância: [1.16880514e-04 7.27497517e-05]
-Sigma^2 raio = 1.889982e-04
+Média: [-0.26183941 -0.27508535], Variância: [1.19654710e-04 6.86645877e-05]
+Sigma^2 raio = 1.881310e-04
 Matriz de covariância:
-[[1.1688e-04, 1.9621e-06],
- [1.9621e-06, 7.2750e-05]]
+[[1.1965e-04, -1.4400e-06],
+ [-1.4400e-06, 6.8665e-05]]
 
 =-==-==-==-==-==-==-==-==-==-=
 Nível: 2, delta_r_n = 1.900190e-01, Tamanho da nuvem inicial (L) = 1.900190e-02
-Média: [0.11989027 0.35868459], Variância: [0.00165947 0.00048435]
-Sigma^2 raio = 2.136669e-03
+Média: [0.11977621 0.35890747], Variância: [0.00148723 0.00043276]
+Sigma^2 raio = 1.918070e-03
 Matriz de covariância:
-[[1.6595e-03, -8.9562e-04],
- [-8.9562e-04, 4.8435e-04]]
+[[1.4872e-03, -8.0138e-04],
+ [-8.0138e-04, 4.3276e-04]]
 
 =-==-==-==-==-==-==-==-==-==-=
 Nível: 3, delta_r_n = 9.500950e-02, Tamanho da nuvem inicial (L) = 9.500950e-03
-Média: [-0.28385026  0.40053805], Variância: [0.00647263 0.00017335]
-Sigma^2 raio = 6.623824e-03
+Média: [-0.28225777  0.40117492], Variância: [0.00607983 0.00015524]
+Sigma^2 raio = 6.228832e-03
 Matriz de covariância:
-[[6.4726e-03, 7.1990e-04],
- [7.1990e-04, 1.7335e-04]]
+[[6.0798e-03, 6.5599e-04],
+ [6.5599e-04, 1.5524e-04]]
+
+=-==-==-==-==-==-==-==-==-==-=
+Nível: 4, delta_r_n = 4.750475e-02, Tamanho da nuvem inicial (L) = 4.750475e-03
+Média: [ 0.19902342 -0.24364637], Variância: [0.03665872 0.00448033]
+Sigma^2 raio = 4.109792e-02
+Matriz de covariância:
+[[3.6659e-02, 7.9413e-03],
+ [7.9413e-03, 4.4803e-03]]
 
 =-==-==-==-==-==-==-==-==-==-=

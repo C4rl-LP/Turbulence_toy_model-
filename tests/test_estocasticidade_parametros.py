@@ -42,16 +42,17 @@ def criar_campo_parametrizado(c_val: float, alpha_val: float):
 
 
 def executar_teste_estocasticidade_parametros(
-    N_fields: int = 3,
+    N_fields: int = 6,
     r0=np.array([0.3, 0.2333]),
     lista_alpha=None,
     lista_c=None,
-    N_particulas: int = 200,
+    N_particulas: int = 500,
     t_max: float = 0.5,
     dt_ref: float = None,
     temporal: bool = False,
     num_amostras: int = 1,
-    output_dir: str = os.path.join("resultados", "estocasticidade_parametros"),
+    delta_r0: float = .1, 
+    output_dir: str =None,
     seed: int = 42
 ) -> dict:
     """
@@ -83,14 +84,22 @@ def executar_teste_estocasticidade_parametros(
     seed : int
         Semente inicial para reprodutibilidade.
     """
+
+    if output_dir is None:
+        nivel = f'em_nivel_{N_fields}'
+        if temporal:
+            output_dir =  os.path.join("resultados", "estocasticidade_parametros_temporal", nivel)
+        else:
+            output_dir =  os.path.join("resultados", "estocasticidade_parametros_estatico", nivel)
+
     os.makedirs(output_dir, exist_ok=True)
     pasta_info = os.path.join(output_dir, "informacoes")
     os.makedirs(pasta_info, exist_ok=True)
 
     if lista_alpha is None:
-        lista_alpha = [1.1, 1.3, float(alpha_padrao), 1.8, 2.0]
+        lista_alpha = [ float(alpha_padrao), 1.8, 2.0, 2.2, 2.4]
     if lista_c is None:
-        lista_c = [0.2, 0.4, float(c_padrao), 0.8, 1.0, 1.2]
+        lista_c = [0.2, 0.4, float(c_padrao), 0.8, 1.0]
 
     lista_alpha = [float(a) for a in lista_alpha]
     lista_c = [float(c) for c in lista_c]
@@ -100,10 +109,10 @@ def executar_teste_estocasticidade_parametros(
 
     R_N = float(fc.R(N_fields))
     delta_r = float(norm_r0 * R_N)
-    dimensao_quadrado = 2.0 * delta_r
+    dimensao_quadrado = delta_r0 * R_N
 
     if dt_ref is None:
-        dt = 0.03 * float(fc.T(N_fields))
+        dt = 0.01 * float(fc.T(N_fields))
     else:
         dt = dt_ref
 
@@ -115,7 +124,7 @@ def executar_teste_estocasticidade_parametros(
         f.write(f"R_1 = {R_1}, T_1 = {T_1}, lambda = {lamb}\n")
         f.write(f"alpha_padrao = {alpha_padrao:.4f}, c_padrao = {c_padrao:.4f}\n")
         f.write(f"r_0 = {r0.tolist()}, ||r_0|| = {norm_r0:.6e}\n")
-        f.write(f"delta_r = ||r0|| * R(N) = {delta_r:.6e}\n")
+        f.write(f"delta_r = ||\delta r0|| * R(N) = {dimensao_quadrado:.6e}\n")
         f.write(f"Tamanho do quadrado/diâmetro L = {dimensao_quadrado:.6e}\n")
         f.write(f"Número de partículas: {N_particulas}\n")
         f.write(f"Tempo de integração t_max: {t_max}, dt = {dt:.6e}\n")
@@ -130,7 +139,7 @@ def executar_teste_estocasticidade_parametros(
     print("=" * 75)
     print("VARREDURA DE ESTOCASTICIDADE ESPONTÂNEA NO ESPAÇO (alpha_cut, c)")
     print("=" * 75)
-    print(f"Nível fixo N_fields = {N_fields} | delta_r = {delta_r:.6e}")
+    print(f"Nível fixo N_fields = {N_fields} | delta_r = {dimensao_quadrado:.6e}")
     print(f"Posição inicial de referência r0: {r0}")
     print(f"Número de partículas: {N_particulas} | t_max: {t_max} | dt: {dt:.6e}")
     print(f"Grade: {len(lista_alpha)} valores de alpha x {len(lista_c)} valores de c ({len(lista_alpha)*len(lista_c)} pontos)")
@@ -209,7 +218,7 @@ def executar_teste_estocasticidade_parametros(
             sigma2_medio = float(np.mean(amostras_sigma2))
             sigma2_std = float(np.std(amostras_sigma2, ddof=1)) if num_amostras > 1 else 0.0
             disp_media = float(np.mean(amostras_disp))
-            norm_sigma2 = sigma2_medio / (delta_r**2)
+            norm_sigma2 = sigma2_medio / (dimensao_quadrado**2)
 
             matriz_sigma2_final[idx_c, idx_a] = sigma2_medio
             matriz_sigma2_desvio[idx_c, idx_a] = sigma2_std
@@ -411,7 +420,7 @@ def executar_teste_estocasticidade_parametros(
         os.path.join(output_dir, "resumo_varredura.npz"),
         N_fields=N_fields,
         r0=r0,
-        delta_r=delta_r,
+        delta_r=dimensao_quadrado,
         lista_alpha=np.array(lista_alpha),
         lista_c=np.array(lista_c),
         matriz_sigma2_final=matriz_sigma2_final,
@@ -433,7 +442,7 @@ def executar_teste_estocasticidade_parametros(
 
     return {
         "N_fields": N_fields,
-        "delta_r": delta_r,
+        "delta_r": dimensao_quadrado,
         "lista_alpha": lista_alpha,
         "lista_c": lista_c,
         "matriz_sigma2_final": matriz_sigma2_final,
@@ -444,4 +453,4 @@ def executar_teste_estocasticidade_parametros(
 
 
 if __name__ == "__main__":
-    executar_teste_estocasticidade_parametros()
+    executar_teste_estocasticidade_parametros(N_fields=7, temporal=True)

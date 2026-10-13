@@ -100,10 +100,10 @@ def executar_teste_estocasticidade(
 
         R_n = float(fc.R(n))
         delta_r_n = float(norm_r0 * R_n)
-        dimensao_quadrado = delta_r0 * delta_r_n
+        dimensao_quadrado = delta_r0 * R_n
 
         if dt_ref is None:
-            dt_n = 0.03 * float(fc.T(n))
+            dt_n = 0.01 * float(fc.T(n))
         else:
             dt_n = dt_ref
 

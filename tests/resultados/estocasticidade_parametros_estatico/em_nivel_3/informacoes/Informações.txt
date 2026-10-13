@@ -1,0 +1,221 @@
+CARACTERÍSTICAS DA VARREDURA NO ESPAÇO DE PARÂMETROS (alpha_cut, c)
+======================================================================
+
+Nível fixo N_fields: 3
+R_1 = 1, T_1 = 1, lambda = 1.5874010519681994
+alpha_padrao = 1.5811, c_padrao = 0.6000
+r_0 = [0.3, 0.2333], ||r_0|| = 3.800380e-01
+delta_r = ||\delta r0|| * R(N) = 2.500000e-02
+Tamanho do quadrado/diâmetro L = 2.500000e-02
+Número de partículas: 500
+Tempo de integração t_max: 0.5, dt = 3.968503e-03
+Campo dependente do tempo: False
+Número de amostras por ponto: 1
+Dinâmica: determinística RK4 (via it.simular_particulas)
+
+Valores testados de alpha: [1.5811388300841898, 1.8, 2.0, 2.2, 2.4]
+Valores testados de c: [0.2, 0.4, 0.6, 0.8, 1.0]
+
+ESTATÍSTICAS DETALHADAS POR COMBINAÇÃO:
+----------------------------------------------------------------------
+
+alpha_cut = 1.5811, c = 0.2000
+Média final: [0.24895954 0.2817154 ], Variância final: [0.00064985 0.00091962]
+Sigma² final: 1.566334e-03 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 2.5061
+Matriz de covariância:
+[[6.4985e-04, 4.5252e-06],
+ [4.5252e-06, 9.1962e-04]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 1.8000, c = 0.2000
+Média final: [-0.52740273  0.07998318], Variância final: [4.88140242e-05 3.19962056e-03]
+Sigma² final: 3.241938e-03 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 5.1871
+Matriz de covariância:
+[[4.8814e-05, 3.2201e-04],
+ [3.2201e-04, 3.1996e-03]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.0000, c = 0.2000
+Média final: [-0.50320825 -0.15801797], Variância final: [0.00019333 0.0002281 ]
+Sigma² final: 4.205896e-04 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.6729
+Matriz de covariância:
+[[1.9333e-04, -1.8370e-04],
+ [-1.8370e-04, 2.2810e-04]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.2000, c = 0.2000
+Média final: [ 0.23893724 -0.28330528], Variância final: [1.80785627e-05 7.78815402e-04]
+Sigma² final: 7.953002e-04 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 1.2725
+Matriz de covariância:
+[[1.8079e-05, 9.8172e-05],
+ [9.8172e-05, 7.7882e-04]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.4000, c = 0.2000
+Média final: [-0.43726243  0.09628343], Variância final: [0.00096627 0.00215749]
+Sigma² final: 3.117511e-03 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 4.9880
+Matriz de covariância:
+[[9.6627e-04, 1.3761e-03],
+ [1.3761e-03, 2.1575e-03]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 1.5811, c = 0.4000
+Média final: [0.23582538 0.30334839], Variância final: [2.17705401e-05 7.20636517e-05]
+Sigma² final: 9.364652e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1498
+Matriz de covariância:
+[[2.1771e-05, 5.3754e-06],
+ [5.3754e-06, 7.2064e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 1.8000, c = 0.4000
+Média final: [-0.03007496  0.41486427], Variância final: [9.32993962e-03 7.09330663e-05]
+Sigma² final: 9.382071e-03 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 15.0113
+Matriz de covariância:
+[[9.3299e-03, -6.3056e-04],
+ [-6.3056e-04, 7.0933e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.0000, c = 0.4000
+Média final: [-0.25174515  0.28081695], Variância final: [0.00097344 0.00058163]
+Sigma² final: 1.551964e-03 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 2.4831
+Matriz de covariância:
+[[9.7344e-04, 7.4654e-04],
+ [7.4654e-04, 5.8163e-04]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.2000, c = 0.4000
+Média final: [-0.45890644 -0.14194537], Variância final: [2.04065932e-04 3.17924023e-05]
+Sigma² final: 2.353866e-04 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.3766
+Matriz de covariância:
+[[2.0407e-04, -6.4831e-05],
+ [-6.4831e-05, 3.1792e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.4000, c = 0.4000
+Média final: [ 0.00122657 -0.51409046], Variância final: [2.76283955e-04 6.26470053e-05]
+Sigma² final: 3.382531e-04 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.5412
+Matriz de covariância:
+[[2.7628e-04, 1.2213e-04],
+ [1.2213e-04, 6.2647e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 1.5811, c = 0.6000
+Média final: [0.31354375 0.30136373], Variância final: [4.74356784e-05 3.13855881e-05]
+Sigma² final: 7.866362e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1259
+Matriz de covariância:
+[[4.7436e-05, -1.3593e-06],
+ [-1.3593e-06, 3.1386e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 1.8000, c = 0.6000
+Média final: [0.19403728 0.2992631 ], Variância final: [0.00147393 0.00042709]
+Sigma² final: 1.897221e-03 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 3.0356
+Matriz de covariância:
+[[1.4739e-03, -6.0634e-04],
+ [-6.0634e-04, 4.2709e-04]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.0000, c = 0.6000
+Média final: [-0.04712438  0.44618478], Variância final: [1.42108206e-03 1.38628600e-05]
+Sigma² final: 1.432075e-03 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 2.2913
+Matriz de covariância:
+[[1.4211e-03, -1.3169e-04],
+ [-1.3169e-04, 1.3863e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.2000, c = 0.6000
+Média final: [-0.24840068  0.26983664], Variância final: [4.89493940e-05 3.29376123e-05]
+Sigma² final: 8.172323e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1308
+Matriz de covariância:
+[[4.8949e-05, -4.2569e-06],
+ [-4.2569e-06, 3.2938e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.4000, c = 0.6000
+Média final: [-0.52202862  0.01193861], Variância final: [3.30852457e-05 4.95262648e-05]
+Sigma² final: 8.244629e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1319
+Matriz de covariância:
+[[3.3085e-05, -9.5685e-06],
+ [-9.5685e-06, 4.9526e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 1.5811, c = 0.8000
+Média final: [0.29659019 0.23032622], Variância final: [3.43820382e-05 4.38574254e-05]
+Sigma² final: 7.808298e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1249
+Matriz de covariância:
+[[3.4382e-05, 1.7587e-06],
+ [1.7587e-06, 4.3857e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 1.8000, c = 0.8000
+Média final: [0.21631784 0.27365903], Variância final: [4.83078787e-05 3.81366515e-05]
+Sigma² final: 8.627164e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1380
+Matriz de covariância:
+[[4.8308e-05, 1.7869e-05],
+ [1.7869e-05, 3.8137e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.0000, c = 0.8000
+Média final: [0.10719081 0.38182958], Variância final: [1.28448766e-04 1.55967796e-05]
+Sigma² final: 1.437575e-04 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.2300
+Matriz de covariância:
+[[1.2845e-04, 1.8007e-05],
+ [1.8007e-05, 1.5597e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.2000, c = 0.8000
+Média final: [-0.07030717  0.46251447], Variância final: [1.23867618e-04 1.15510360e-05]
+Sigma² final: 1.351478e-04 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.2162
+Matriz de covariância:
+[[1.2387e-04, -4.2771e-06],
+ [-4.2771e-06, 1.1551e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.4000, c = 0.8000
+Média final: [-0.23376988  0.29957334], Variância final: [4.98125743e-05 3.23217860e-05]
+Sigma² final: 8.197009e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1312
+Matriz de covariância:
+[[4.9813e-05, 1.0514e-05],
+ [1.0514e-05, 3.2322e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 1.5811, c = 1.0000
+Média final: [0.23641691 0.22642947], Variância final: [4.16067317e-05 4.13103020e-05]
+Sigma² final: 8.275120e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1324
+Matriz de covariância:
+[[4.1607e-05, 1.1430e-05],
+ [1.1430e-05, 4.1310e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 1.8000, c = 1.0000
+Média final: [0.21928991 0.26836016], Variância final: [4.41303578e-05 3.38054998e-05]
+Sigma² final: 7.777999e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1244
+Matriz de covariância:
+[[4.4130e-05, 5.2101e-06],
+ [5.2101e-06, 3.3805e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.0000, c = 1.0000
+Média final: [0.15929488 0.30903834], Variância final: [8.69536937e-05 9.41320495e-05]
+Sigma² final: 1.807236e-04 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.2892
+Matriz de covariância:
+[[8.6954e-05, -8.2124e-05],
+ [-8.2124e-05, 9.4132e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.2000, c = 1.0000
+Média final: [0.08644036 0.41122679], Variância final: [5.84417611e-05 3.02406666e-05]
+Sigma² final: 8.850506e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1416
+Matriz de covariância:
+[[5.8442e-05, -1.8590e-05],
+ [-1.8590e-05, 3.0241e-05]]
+=-==-==-==-==-==-==-==-==-==-=
+alpha_cut = 2.4000, c = 1.0000
+Média final: [-0.05956892  0.46597789], Variância final: [6.78826734e-05 2.43113112e-05]
+Sigma² final: 9.200960e-05 (std: 0.0000e+00)
+Dispersão normalizada sigma²/delta_r²: 0.1472
+Matriz de covariância:
+[[6.7883e-05, -4.2391e-06],
+ [-4.2391e-06, 2.4311e-05]]
+=-==-==-==-==-==-==-==-==-==-=

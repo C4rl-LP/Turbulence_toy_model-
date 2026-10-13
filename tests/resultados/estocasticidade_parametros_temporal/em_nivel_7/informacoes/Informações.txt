@@ -1,0 +1,21 @@
+CARACTERÍSTICAS DA VARREDURA NO ESPAÇO DE PARÂMETROS (alpha_cut, c)
+======================================================================
+
+Nível fixo N_fields: 7
+R_1 = 1, T_1 = 1, lambda = 1.5874010519681994
+alpha_padrao = 1.5811, c_padrao = 0.6000
+r_0 = [0.3, 0.2333], ||r_0|| = 3.800380e-01
+delta_r = ||\delta r0|| * R(N) = 1.562500e-03
+Tamanho do quadrado/diâmetro L = 1.562500e-03
+Número de partículas: 500
+Tempo de integração t_max: 0.5, dt = 6.250000e-04
+Campo dependente do tempo: True
+Número de amostras por ponto: 1
+Dinâmica: determinística RK4 (via it.simular_particulas)
+
+Valores testados de alpha: [1.5811388300841898, 1.8, 2.0, 2.2, 2.4]
+Valores testados de c: [0.2, 0.4, 0.6, 0.8, 1.0]
+
+ESTATÍSTICAS DETALHADAS POR COMBINAÇÃO:
+----------------------------------------------------------------------
+
