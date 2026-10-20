@@ -39,8 +39,8 @@ def main():
         ],
         help="Nome do teste a ser executado."
     )
-    parser.add_argument("--N_particulas", type=int, default=300, help="Número de partículas / realizações.")
-    parser.add_argument("--t_max", type=float, default=1.0, help="Tempo máximo de simulação.")
+    parser.add_argument("--N_particulas", type=int, default=10000, help="Número de partículas / realizações.")
+    parser.add_argument("--t_max", type=float, default=1/5, help="Tempo máximo de simulação.")
     parser.add_argument("--seed", type=int, default=42, help="Semente de números aleatórios.")
 
     args = parser.parse_args()
@@ -49,35 +49,13 @@ def main():
     print(" SUÍTE COMPLETA DE TESTES NUMÉRICOS DA DINÂMICA TURBULENTA")
     print("=" * 70)
 
-    if args.teste in ["todos", "convergencia_dt"]:
-        executar_teste_convergencia_dt(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
-
-    if args.teste in ["todos", "convergencia_N"]:
-        executar_teste_convergencia_N(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
 
     if args.teste in ["todos", "estocasticidade"]:
-        executar_teste_estocasticidade(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
+        executar_teste_estocasticidade(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed, lista_N_fields=(1,2,3,4,5,6,7,8))
 
     if args.teste in ["todos", "estocasticidade_parametros"]:
-        executar_teste_estocasticidade_parametros(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
-
-    if args.teste in ["todos", "estatisticas_temporais"]:
-        executar_teste_estatisticas_temporais(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
-
-    if args.teste in ["todos", "difusao"]:
-        executar_teste_difusao(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
-
-    if args.teste in ["todos", "comparacao"]:
-        executar_teste_comparacao_simuladores(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
-
-    if args.teste in ["todos", "transicao_temporal"]:
-        executar_teste_transicao_temporal(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
-
-    if args.teste in ["todos", "distribuicoes"]:
-        executar_teste_distribuicoes(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed)
-
-    if args.teste in ["todos", "robustez"]:
-        executar_teste_robustez(N_fields=3, t_max=args.t_max, seed=args.seed)
+        for i in range(8):
+            executar_teste_estocasticidade_parametros(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed, N_fields=i)
 
     print("\nExecução concluída! Todos os resultados e gráficos foram salvos na pasta 'resultados/'.\n")
 

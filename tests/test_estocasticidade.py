@@ -99,7 +99,7 @@ def executar_teste_estocasticidade(
         os.makedirs(sub_dir, exist_ok=True)
 
         R_n = float(fc.R(n))
-        delta_r_n = float(norm_r0 * R_n)
+        
         dimensao_quadrado = delta_r0 * R_n
 
         if dt_ref is None:
@@ -109,7 +109,7 @@ def executar_teste_estocasticidade(
 
         print(f"\n[Nível n = {n}]")
         print(f"  R({n}) = {R_n:.6e}")
-        print(f"  delta_r_{n} = {delta_r_n:.6e}")
+        print(f"  delta_r_{n} = {dimensao_quadrado:.6e}")
         print(f"  dt = {dt_n:.6e}")
 
         # -------------------------------------------------------------
@@ -146,7 +146,7 @@ def executar_teste_estocasticidade(
         # 3. Registro no arquivo de informações (seguindo integradores.py)
         # -------------------------------------------------------------
         with open(nome_do_txt_info, "a", encoding="utf-8") as f:
-            f.write(f"Nível: {n}, delta_r_n = {delta_r_n:.6e}, Tamanho da nuvem inicial (L) = {dimensao_quadrado:.6e}\n")
+            f.write(f"Nível: {n}, delta_r_n = {dimensao_quadrado:.6e}, Tamanho da nuvem inicial (L) = {dimensao_quadrado:.6e}\n")
             f.write(f"Média: {mean_final}, Variância: {var_final}\n")
             f.write(f"Sigma^2 raio = {sigma2_final:.6e}\n")
             f.write("Matriz de covariância:\n")
@@ -161,7 +161,7 @@ def executar_teste_estocasticidade(
             os.path.join(sub_dir, f"estocasticidade_nivel_{n}_dados.npz"),
             N_fields=n,
             R_n=R_n,
-            delta_r_n=delta_r_n,
+            delta_r_n=dimensao_quadrado,
             dimensao_quadrado=dimensao_quadrado,
             t=ts,
             rs=rs,
@@ -281,7 +281,7 @@ def executar_teste_estocasticidade(
         # 8. Gráfico de dispersão inicial vs final
         # -------------------------------------------------------------
         plt.figure(figsize=(6, 6))
-        plt.scatter(rs[0, :, 0], rs[0, :, 1], s=12, alpha=0.5, label=rf"Inicial ($\delta r_n = {delta_r_n:.2e}$)")
+        plt.scatter(rs[0, :, 0], rs[0, :, 1], s=12, alpha=0.5, label=rf"Inicial ($\delta r_n = {dimensao_quadrado:.2e}$)")
         plt.scatter(rs_final[:, 0], rs_final[:, 1], s=12, alpha=0.6, label="Final")
         plt.scatter(r0[0], r0[1], c="red", marker="x", s=100, linewidths=2, label=r"$r_0$")
         plt.scatter(mean_final[0], mean_final[1], c="black", marker="+", s=100, linewidths=2, label=r"$\bar{r}_{final}$")
@@ -303,7 +303,7 @@ def executar_teste_estocasticidade(
         resultados_globais[f"N_{n}"] = {
             "N_fields": n,
             "R_n": R_n,
-            "delta_r_n": delta_r_n,
+            "delta_r_n": dimensao_quadrado,
             "ts": ts,
             "mean_x": stats["mean_x"],
             "mean_y": stats["mean_y"],
