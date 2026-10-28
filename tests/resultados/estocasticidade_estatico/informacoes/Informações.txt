@@ -3,25 +3,17 @@ Características
 R_1 = 1, T_1 = 1, lambda = 1.5874010519681994
 alpha de corte = 1.5811388300841898, Fator c = 0.6
 r_0 = [0.3, 0.2333], Número de partículas: 10000
-Tempo total (t_max): 0.5
+Tempo total (t_max): 0.2
 Dinâmica: determinística (solve_RK4 via it.simular_particulas)
 Condição inicial: disco uniforme de raio delta_r_n = ||r0|| * R(n)
 
 Estatísticas:
 
 Nível: 1, delta_r_n = 1.000000e-01, Tamanho da nuvem inicial (L) = 1.000000e-01
-Média: [-0.25941914  0.27767159], Variância: [0.00054865 0.00072515]
-Sigma^2 raio = 1.273673e-03
+Média: [0.09237955 0.3686509 ], Variância: [0.00063608 0.00060678]
+Sigma^2 raio = 1.242728e-03
 Matriz de covariância:
-[[5.4865e-04, 8.0932e-06],
- [8.0932e-06, 7.2515e-04]]
-
-=-==-==-==-==-==-==-==-==-==-=
-Nível: 2, delta_r_n = 5.000000e-02, Tamanho da nuvem inicial (L) = 5.000000e-02
-Média: [0.26098127 0.35235861], Variância: [0.00016534 0.00015032]
-Sigma^2 raio = 3.156263e-04
-Matriz de covariância:
-[[1.6534e-04, 2.2587e-05],
- [2.2587e-05, 1.5032e-04]]
+[[6.3608e-04, 2.8867e-05],
+ [2.8867e-05, 6.0678e-04]]
 
 =-==-==-==-==-==-==-==-==-==-=

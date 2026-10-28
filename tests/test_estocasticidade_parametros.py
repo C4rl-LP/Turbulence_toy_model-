@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import numpy as np
+import cupy as cp
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -194,6 +195,8 @@ def executar_teste_estocasticidade_parametros(
                 )
 
                 stats = calcular_estatisticas_trajetorias(ts, rs)
+                # Converter uma vez para as agregações, arquivos e gráficos na CPU.
+                rs = cp.asnumpy(rs)
                 rs_final = rs[-1, :, :]
                 mean_f = np.mean(rs_final, axis=0)
                 var_f = np.var(rs_final, axis=0, ddof=1)
