@@ -1,4 +1,5 @@
 import numpy as np
+import cupy as cp
 import matplotlib.pyplot as plt
 from itertools import product
 import integradores as it
@@ -17,39 +18,39 @@ from funcoes_para_centros import (
 # Campo base como função dos centros, sem usar o index
 
 def campo_2(
-    x: np.ndarray | float,
-    y: np.ndarray | float,
+    x: cp.ndarray | float,
+    y: cp.ndarray | float,
     x_c: float,
     y_c: float,
     t: float,
     n: int,
     c: float = c_padrao,
     alpha: float = alpha_padrao
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[cp.ndarray, cp.ndarray]:
     """
     Campo vetorial induzido por um único centro
-    do nível n nos pontos (x, y).
+    do nível n nos pontos (x, y) na GPU (CuPy).
     """
-    x = np.asarray(x)
-    y = np.asarray(y)
+    x = cp.asarray(x)
+    y = cp.asarray(y)
 
-    # Diferenças vetoriais (arrays)
+    # Diferenças vetoriais (arrays na GPU)
     dx = x - x_c
     dy = y - y_c
     r2 = dx**2 + dy**2
     R2_coef = (fc.R_cufoff(n, alpha))**2
 
-    vx= np.zeros_like(dx)
-    vy = np.zeros_like(dy)
+    vx = cp.zeros_like(dx)
+    vy = cp.zeros_like(dy)
 
-    poten = np.zeros_like(r2)
+    poten = cp.zeros_like(r2)
 
     mask = r2 < R2_coef
     
-    if np.any(mask):
+    if cp.any(mask):
         poten[mask] = (
-            2*np.pi
-            * np.exp(c / ((r2[mask] / R2_coef) - 1))
+            2 * cp.pi
+            * cp.exp(c / ((r2[mask] / R2_coef) - 1))
             / fc.T(n)
         )
     vx[mask] = -dy[mask] * poten[mask]
@@ -59,37 +60,39 @@ def campo_2(
 # Campo base que utiliza os index 
 
 def campo_2_com_index(
-    x: np.ndarray | float,
-    y: np.ndarray | float,
+    x: cp.ndarray | float,
+    y: cp.ndarray | float,
     t: float,
     n: int,
     index: list[int],
     c: float = c_padrao,
     alpha: float = alpha_padrao
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[cp.ndarray, cp.ndarray]:
     """
     Campo vetorial induzido por um único centro
-    do nível n nos pontos (x, y).
+    do nível n nos pontos (x, y) na GPU (CuPy).
     """
     x_centro_n = fc.x_centros(n, index, t)
+    x = cp.asarray(x)
+    y = cp.asarray(y)
 
-    # Diferenças vetoriais (arrays)
+    # Diferenças vetoriais (arrays na GPU)
     dx = x - x_centro_n[0]
     dy = y - x_centro_n[1]
     r2 = dx**2 + dy**2
     R2 = (fc.R_cufoff(n, alpha))**2
 
-    vx= np.zeros_like(dx)
-    vy = np.zeros_like(dy)
+    vx = cp.zeros_like(dx)
+    vy = cp.zeros_like(dy)
 
-    poten = np.zeros_like(r2)
+    poten = cp.zeros_like(r2)
 
     mask = r2 < R2
 
-    if np.any(mask):
+    if cp.any(mask):
         poten[mask] = (
-            2*np.pi
-            * np.exp(c / ((r2[mask] / R2) - 1))
+            2 * cp.pi
+            * cp.exp(c / ((r2[mask] / R2) - 1))
             / fc.T(n)
         )
     vx[mask] = -dy[mask] * poten[mask]
@@ -99,17 +102,19 @@ def campo_2_com_index(
 
 # Campo total usando todos os index e não ótimo
 def campo_total_correto(
-    x: np.ndarray,
-    y: np.ndarray,
+    x: cp.ndarray,
+    y: cp.ndarray,
     t: float,
     n_max: int = 3
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[cp.ndarray, cp.ndarray]:
     """
     Soma o campo vetorial de todos os níveis
-    e todos os centros hierárquicos.
+    e todos os centros hierárquicos na GPU (CuPy).
     """
-    Vx = np.zeros_like(x)
-    Vy = np.zeros_like(y)
+    x = cp.asarray(x)
+    y = cp.asarray(y)
+    Vx = cp.zeros_like(x)
+    Vy = cp.zeros_like(y)
     
     for n in range(1, n_max + 1):
         for idx in fc.indices_nivel(n):
@@ -120,19 +125,22 @@ def campo_total_correto(
 
     return Vx, Vy
 def campo_total_podado(
-    xp: np.ndarray | float,
-    yp: np.ndarray | float,
+    xp: cp.ndarray | float,
+    yp: cp.ndarray | float,
     t: float,
     n_max: int = 3,
     c: float = c_padrao,
     alpha: float = alpha_padrao
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[cp.ndarray, cp.ndarray]:
     """
-    Soma contribuições apenas dos centros ativos na árvore podada.
+    Soma contribuições apenas dos centros ativos na árvore podada na GPU (CuPy).
     Permite passar opcionalmente os parâmetros c e alpha.
     """
-    xp_arr = np.atleast_1d(xp)
-    yp_arr = np.atleast_1d(yp)
+    xp_is_scalar = cp.isscalar(xp)
+    yp_is_scalar = cp.isscalar(yp)
+
+    xp_arr = cp.atleast_1d(cp.asarray(xp))
+    yp_arr = cp.atleast_1d(cp.asarray(yp))
     Np = len(xp_arr)
     x0, y0 = 0.0, 0.0
 
@@ -140,13 +148,13 @@ def campo_total_podado(
     vx_total, vy_total = campo_2(xp_arr, yp_arr, x0, y0, t, 1, c=c, alpha=alpha)
 
     if n_max > 1:
-        centros_x = [np.array([x0]) for _ in range(Np)]
-        centros_y = [np.array([y0]) for _ in range(Np)]
+        centros_x = [cp.array([x0]) for _ in range(Np)]
+        centros_y = [cp.array([y0]) for _ in range(Np)]
 
         for n in range(1, n_max):
             R_cut2 = (fc.R_cufoff(n + 1, alpha))**2
             inv_R_cut2 = 1.0 / R_cut2
-            fator_poten = 2.0 * np.pi / fc.T(n + 1)
+            fator_poten = 2.0 * cp.pi / fc.T(n + 1)
 
             sub_cx_base, sub_cy_base = fc.subcentro(n, 0.0, 0.0, t)
 
@@ -157,8 +165,8 @@ def campo_total_podado(
                 cx = centros_x[p]
                 cy = centros_y[p]
                 if len(cx) == 0:
-                    novos_x.append(np.empty(0))
-                    novos_y.append(np.empty(0))
+                    novos_x.append(cp.empty(0))
+                    novos_y.append(cp.empty(0))
                     continue
 
                 scx = (cx[:, None] + sub_cx_base[None, :]).ravel()
@@ -169,7 +177,7 @@ def campo_total_podado(
                 r2 = dx*dx + dy*dy
                 mask = r2 < R_cut2
 
-                if np.any(mask):
+                if cp.any(mask):
                     scx_m = scx[mask]
                     scy_m = scy[mask]
                     novos_x.append(scx_m)
@@ -178,17 +186,17 @@ def campo_total_podado(
                     dx_m = dx[mask]
                     dy_m = dy[mask]
                     r2_m = r2[mask]
-                    poten = fator_poten * np.exp(c / ((r2_m * inv_R_cut2) - 1.0))
-                    vx_total[p] += np.sum(-dy_m * poten)
-                    vy_total[p] += np.sum(dx_m * poten)
+                    poten = fator_poten * cp.exp(c / ((r2_m * inv_R_cut2) - 1.0))
+                    vx_total[p] += cp.sum(-dy_m * poten)
+                    vy_total[p] += cp.sum(dx_m * poten)
                 else:
-                    novos_x.append(np.empty(0))
-                    novos_y.append(np.empty(0))
+                    novos_x.append(cp.empty(0))
+                    novos_y.append(cp.empty(0))
 
             centros_x = novos_x
             centros_y = novos_y
 
-    if np.isscalar(xp) and np.isscalar(yp):
+    if xp_is_scalar and yp_is_scalar:
         return float(vx_total[0]), float(vy_total[0])
     return vx_total, vy_total
 

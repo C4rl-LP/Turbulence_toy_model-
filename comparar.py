@@ -1,54 +1,64 @@
 import time
+import cupy as cp
 import campos 
 import os
 
-# Comparar tempo dos campos 
-xp=0.13
-yp=0.41
+# Comparar tempo dos campos na GPU (CuPy)
+xp = 0.13
+yp = 0.41
 
-nmax=9
-t=0.0
+nmax = 9
+t = 0.0
 
-Nrep=100
+Nrep = 100
 
-t0=time.perf_counter()
+# Warm-up na GPU
+_ = campos.campo_total_podado(xp, yp, t, nmax)
+cp.cuda.Stream.null.synchronize()
+
+t0 = time.perf_counter()
 
 for _ in range(Nrep):
     campos.campo_total_podado(
-        xp,yp,t,nmax
+        xp, yp, t, nmax
     )
+cp.cuda.Stream.null.synchronize()
 
-t1=time.perf_counter()
+t1 = time.perf_counter()
 
-tempo_podado=t1-t0
+tempo_podado = t1 - t0
 
 # -------- campo completo ----------
-t0=time.perf_counter()
+_ = campos.campo_total_correto(xp, yp, t, nmax)
+cp.cuda.Stream.null.synchronize()
+
+t0 = time.perf_counter()
 
 for _ in range(Nrep):
     campos.campo_total_correto(
-        xp,yp,t,nmax
+        xp, yp, t, nmax
     )
+cp.cuda.Stream.null.synchronize()
 
-t1=time.perf_counter()
+t1 = time.perf_counter()
 
-tempo_full=t1-t0
+tempo_full = t1 - t0
 
 
 # -------- campo podado ----------
 
 
 
-print("Completo :",tempo_full)
-print("Podado   :",tempo_podado)
+print("Completo :", tempo_full)
+print("Podado   :", tempo_podado)
 
 print(
  "speedup =",
- tempo_full/tempo_podado
+ tempo_full / tempo_podado
 )
 
 pasta = os.path.dirname(os.path.abspath(__file__))
-arquivo = os.path.join(pasta,'Teste_temporal.txt')
+arquivo = os.path.join(pasta, 'Teste_temporal.txt')
 
 with open(arquivo, "a") as f:
 

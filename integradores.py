@@ -1,4 +1,5 @@
 import numpy as np 
+import cupy as cp
 import os
 from matplotlib import pyplot as plt
 import funcoes_para_centros as fc
@@ -7,99 +8,66 @@ import time
 
 def solve_RK4(func, r0, t0, dt, t_max):
     """
-    Resolve o sistema dr/dt = func(t, r) usando RK4.
+    Resolve o sistema dr/dt = func(t, r) usando RK4 na GPU com CuPy.
 
     Parâmetros:
     - func : função do campo vetorial
-    - r0   : condição inicial (array)
+    - r0   : condição inicial (array CuPy ou NumPy)
     - t0   : tempo inicial
     - dt   : passo de tempo
     - t_max: tempo final
     """
+    r0 = cp.asarray(r0)
     Nt = int((t_max - t0)/dt) + 1
-    r = np.zeros((Nt, *r0.shape))
-    t = np.zeros(Nt)
+    r = cp.zeros((Nt, *r0.shape), dtype=r0.dtype)
+    t = np.linspace(t0, t0 + (Nt - 1) * dt, Nt)
 
     r[0] = r0
-    t[0] = t0
 
     for i in range(Nt - 1):
-        ti = t[i]
+        ti = float(t[i])
         ri = r[i]
 
         k1 = func(ti, ri)
-        k2 = func(ti + dt/2, ri + dt/2*k1)
-        k3 = func(ti + dt/2, ri + dt/2*k2)
+        k2 = func(ti + dt/2, ri + (dt/2)*k1)
+        k3 = func(ti + dt/2, ri + (dt/2)*k2)
         k4 = func(ti + dt,   ri + dt*k3)
 
-        r[i+1] = ri + dt/6*(k1 + 2*k2 + 2*k3 + k4)
-        t[i+1] = ti + dt
+        r[i+1] = ri + (dt/6)*(k1 + 2*k2 + 2*k3 + k4)
 
     return t, r
 
 def solve_euler_maruyama(func, r0, t_max, dt):
     """
     Resolve
-
         dr = V(r,t) dt + dW
-
-    usando o método de Euler-Maruyama.
-
-    Parâmetros
-    ----------
-    func : função
-        Campo de velocidade V(t, r).
-
-    r0 : array_like, shape (2,)
-        Condição inicial [x0, y0].
-
-    t_max : float
-        Tempo total da simulação.
-
-    dt : float
-        Passo temporal.
-
-    Retorna
-    -------
-    t : ndarray, shape (Nt,)
-        Tempos.
-
-    r : ndarray, shape (Nt, 2)
-        Trajetória.
+    usando o método de Euler-Maruyama na GPU com CuPy.
     """
-
+    r0 = cp.asarray(r0, dtype=float)
     N_steps = int(np.ceil(t_max / dt))
-
-    # Ajusta dt para que o último ponto seja exatamente t_max
     dt_real = t_max / N_steps
 
     t = np.linspace(0.0, t_max, N_steps + 1)    
 
-    r = np.empty((N_steps + 1, 2))
+    r = cp.empty((N_steps + 1, 2), dtype=float)
     r[0] = r0
 
     for k in range(N_steps):
-        tk = t[k]
-
+        tk = float(t[k])
         V = func(tk, r[k])
-
-        dW = np.sqrt(dt_real) * np.random.normal(
-            size=2
-        )
-
-        r[k + 1] = (
-            r[k]
-            + V * dt_real
-            + dW
-        )
+        dW = cp.sqrt(dt_real) * cp.random.normal(size=2)
+        r[k + 1] = r[k] + V * dt_real + dW
 
     return t, r
 
 def simular_particulas(N, N_fields, dimensao_quadrado, r0, dt=0.01, t_max=1, func = None, temporal = False):
     """
     Simula N partículas em um pequeno quadrado
-    ao redor da posição inicial r0.
+    ao redor da posição inicial r0 na GPU com CuPy.
     """
+    if func is None:
+        import campos
+        func = campos.campo_total_podado
 
     def funcao(t, r):
         x = r[:, 0]
@@ -107,26 +75,23 @@ def simular_particulas(N, N_fields, dimensao_quadrado, r0, dt=0.01, t_max=1, fun
         if temporal:
             Vx, Vy = func(x, y, t, N_fields)
         else:
-            Vx, Vy = func(x, y, 0, N_fields)
-        return np.column_stack((Vx, Vy))
+            Vx, Vy = func(x, y, 0.0, N_fields)
+        return cp.column_stack((Vx, Vy))
 
+    r0_gpu = cp.asarray(r0, dtype=float).reshape(-1)
     L = dimensao_quadrado
-
-    # Distribuição inicial uniforme em um círculo de raio L/2
     R0 = L / 2
 
-    theta = np.random.uniform(0, 2*np.pi, size=N-1)
-    u = np.random.uniform(0, 1, size=N-1)
+    theta = cp.random.uniform(0, 2*cp.pi, size=N-1)
+    u = cp.random.uniform(0, 1, size=N-1)
 
-    r = R0 * np.sqrt(u)
+    r_rand = R0 * cp.sqrt(u)
 
-    dx = r * np.cos(theta)
-    dy = r * np.sin(theta)
+    dx = r_rand * cp.cos(theta)
+    dy = r_rand * cp.sin(theta)
 
-    particle_t0 = r0 + np.column_stack((dx, dy))
-
-    # adiciona a partícula central exatamente em r0
-    particle_t0 = np.vstack((r0,particle_t0))
+    particle_t0 = r0_gpu + cp.column_stack((dx, dy))
+    particle_t0 = cp.vstack((r0_gpu, particle_t0))
 
     t, r = solve_RK4(funcao, particle_t0, 0.0, dt, t_max)
     return t, r
@@ -141,123 +106,48 @@ def simular_particulas_ruidosa(
     t_max=1,
     lamb=2**(2/3),
     func=None,
-    temporal=False
+    temporal=False,
+    sigma0=0.0
 ):
     """
     Simula N_particulas realizações da SDE
 
         dr = V_N(r,t) dt + dW
 
-    todas próximas da mesma condição inicial r0.
-
-    Parâmetros
-    ----------
-    N : int
-        Número de realizações/partículas.
-
-    N_fields : int
-        Número de níveis do campo V_N.
-
-    r0 : array_like, shape (2,)
-        Condição inicial central.
-
-    dt_1 : float
-        Passo temporal correspondente ao nível N_fields = 1.
-
-    t_max : float
-        Tempo total da simulação.
-
-    lamb : float
-        Fator de escala temporal.
-
-    func : função
-        Campo de velocidade.
-
-        Deve retornar:
-            Vx, Vy = func(x, y, t, N_fields)
-
-    temporal : bool
-        Se True, utiliza o tempo t no campo.
-        Se False, utiliza t = 0.
-
-    Retorna
-    -------
-    t : ndarray, shape (Nt,)
-        Tempos.
-
-    rs : ndarray, shape (Nt, N, 2)
-        Trajetórias das N realizações.
+    todas próximas da mesma condição inicial r0 na GPU com CuPy.
     """
+    if func is None:
+        import campos
+        func = campos.campo_total_podado
 
-    r0 = np.asarray(r0, dtype=float)
-
-    # ---------------------------------------------------------
-    # Passo temporal correspondente ao nível N_fields
-    # ---------------------------------------------------------
+    r0_gpu = cp.asarray(r0, dtype=float).reshape(-1)
 
     dt_N = dt_1 / lamb**(N_fields - 1)
-
     N_steps = int(np.ceil(t_max / dt_N))
-
-    # Ajuste para terminar exatamente em t_max
     dt_N = t_max / N_steps
 
     t = np.linspace(0.0, t_max, N_steps + 1)
 
-    # ---------------------------------------------------------
-    # Condições iniciais
-    # ---------------------------------------------------------
+    particle_t0 = cp.tile(r0_gpu, (N, 1))
+    if sigma0 > 0:
+        particle_t0 = particle_t0 + sigma0 * cp.random.normal(size=(N, 2))
 
-    particle_t0 = np.tile(r0, (N, 1))
-
-
-    # ---------------------------------------------------------
-    # Armazenamento das trajetórias
-    # ---------------------------------------------------------
-
-    rs = np.empty((N_steps + 1, N, 2))
-
+    rs = cp.empty((N_steps + 1, N, 2), dtype=float)
     rs[0] = particle_t0
 
-    # ---------------------------------------------------------
-    # Euler-Maruyama
-    # ---------------------------------------------------------
-
     for k in range(N_steps):
-
-        tk = t[k]
-
+        tk = float(t[k])
         x = rs[k, :, 0]
         y = rs[k, :, 1]
 
         if temporal:
-            Vx, Vy = func(
-                x,
-                y,
-                tk,
-                N_fields
-            )
+            Vx, Vy = func(x, y, tk, N_fields)
         else:
-            Vx, Vy = func(
-                x,
-                y,
-                0,
-                N_fields
-            )
+            Vx, Vy = func(x, y, 0.0, N_fields)
 
-        V = np.column_stack((Vx, Vy))
-
-        # Wiener independente para cada realização
-        dW = np.sqrt(dt_N) * np.random.normal(
-            size=(N, 2)
-        )
-
-        # Euler-Maruyama
-        rs[k + 1] = (
-            rs[k]
-            + V * dt_N
-            + dW
-        )
+        V = cp.column_stack((Vx, Vy))
+        dW = cp.sqrt(dt_N) * cp.random.normal(size=(N, 2))
+        rs[k + 1] = rs[k] + V * dt_N + dW
 
     return t, rs
 
@@ -359,9 +249,9 @@ def testar_estabilidade_estatico(
             # Para manter uma escala de referência para os gráficos
             L = fc.R(n) / 8
 
-        # rs tem shape:
-        #
-        # (Nt, N_particulas, 2)
+        # rs tem shape: (Nt, N_particulas, 2)
+        rs_cpu = cp.asnumpy(rs)
+        r0_array = cp.asnumpy(r0).reshape(-1)
 
         t1 = time.perf_counter()
 
@@ -375,8 +265,8 @@ def testar_estabilidade_estatico(
 
             # Trajetória
             plt.plot(
-                rs[:, i, 0],
-                rs[:, i, 1],
+                rs_cpu[:, i, 0],
+                rs_cpu[:, i, 1],
                 lw=1,
                 alpha=0.4,
                 color=cores[i]
@@ -384,8 +274,8 @@ def testar_estabilidade_estatico(
 
             # Ponto inicial
             plt.scatter(
-                rs[0, i, 0],
-                rs[0, i, 1],
+                rs_cpu[0, i, 0],
+                rs_cpu[0, i, 1],
                 facecolors="none",
                 edgecolors=cores[i],
                 s=30,
@@ -394,16 +284,14 @@ def testar_estabilidade_estatico(
 
             # Ponto final
             plt.scatter(
-                rs[-1, i, 0],
-                rs[-1, i, 1],
+                rs_cpu[-1, i, 0],
+                rs_cpu[-1, i, 1],
                 color=cores[i],
                 s=30,
                 zorder=3
             )
 
         # Ponto central
-        r0_array = np.asarray(r0).reshape(-1)
-
         plt.scatter(
             r0_array[0],
             r0_array[1],
@@ -593,39 +481,48 @@ def testar_estabilidade_temporal(
             )
 
         # ---------------------------------------------------------
-        # Distribuição final
+        # Distribuição final calculada na GPU
         # ---------------------------------------------------------
 
         rs_final = rs[-1, :, :]
 
-        mean = np.mean(
+        mean = cp.mean(
             rs_final,
             axis=0
         )
 
-        var = np.var(
+        var = cp.var(
             rs_final,
             axis=0,
             ddof=1
         )
 
-        matriz_covarianca = np.cov(
+        matriz_covarianca = cp.cov(
             rs_final.T,
             ddof=1
         )
 
-        sigma2_total = np.mean(
-            np.sum(
+        sigma2_total = cp.mean(
+            cp.sum(
                 (rs_final - mean)**2,
                 axis=1
             )
         )
 
+        # Conversão para CPU apenas para geração de gráficos e salvamento em arquivo
+        mean_cpu = cp.asnumpy(mean)
+        var_cpu = cp.asnumpy(var)
+        cov_cpu = cp.asnumpy(matriz_covarianca)
+        sigma2_val = float(sigma2_total)
+        rs_cpu = cp.asnumpy(rs)
+        rs_final_cpu = cp.asnumpy(rs_final)
+        r0_array = cp.asnumpy(r0).reshape(-1)
+
         dic_info = {
-            "Media": mean,
-            "Varianca": var,
-            "Matriz de covariança": matriz_covarianca,
-            "sigma total": sigma2_total,
+            "Media": mean_cpu,
+            "Varianca": var_cpu,
+            "Matriz de covariança": cov_cpu,
+            "sigma total": sigma2_val,
             "L": L
         }
 
@@ -643,14 +540,14 @@ def testar_estabilidade_temporal(
             )
 
             f.write(
-                f"Média: {mean}, "
-                f"Variância: {var}\n"
+                f"Média: {mean_cpu}, "
+                f"Variância: {var_cpu}\n"
             )
 
-            cov = matriz_covarianca
+            cov = cov_cpu
 
             f.write(
-                f"Sigma^2 raio = {sigma2_total}\n"
+                f"Sigma^2 raio = {sigma2_val}\n"
             )
 
             f.write(
@@ -686,16 +583,16 @@ def testar_estabilidade_temporal(
         for i in range(N_particulas):
 
             plt.plot(
-                rs[:, i, 0],
-                rs[:, i, 1],
+                rs_cpu[:, i, 0],
+                rs_cpu[:, i, 1],
                 lw=1,
                 alpha=0.4,
                 color=cores[i]
             )
 
             plt.scatter(
-                rs[0, i, 0],
-                rs[0, i, 1],
+                rs_cpu[0, i, 0],
+                rs_cpu[0, i, 1],
                 facecolors="none",
                 edgecolors=cores[i],
                 s=30,
@@ -703,14 +600,12 @@ def testar_estabilidade_temporal(
             )
 
             plt.scatter(
-                rs[-1, i, 0],
-                rs[-1, i, 1],
+                rs_cpu[-1, i, 0],
+                rs_cpu[-1, i, 1],
                 color=cores[i],
                 s=30,
                 zorder=3
             )
-
-        r0_array = np.asarray(r0).reshape(-1)
 
         plt.scatter(
             r0_array[0],
@@ -768,8 +663,8 @@ def testar_estabilidade_temporal(
 
         plt.figure(figsize=(6, 6))
 
-        x = rs_final[:, 0]
-        y = rs_final[:, 1]
+        x = rs_final_cpu[:, 0]
+        y = rs_final_cpu[:, 1]
 
         plt.hist2d(
             x,

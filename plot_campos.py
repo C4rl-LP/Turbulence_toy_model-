@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
+import cupy as cp
 import campos 
 
 
@@ -11,16 +12,16 @@ def plot_campo(t=0.0, N_fields=3, L=5,x_0=  0, y_0= 0, resolucao=200, func=None)
 
     X, Y = np.meshgrid(x, y)
 
-    # achata a malha em lista de pontos
-    xp = X.ravel()
-    yp = Y.ravel()
+    # achata a malha em lista de pontos e envia para GPU
+    xp = cp.asarray(X.ravel())
+    yp = cp.asarray(Y.ravel())
 
-    # sua função recebe vetores 1D como antes
+    # calcula o campo vetorial na GPU
     Vx, Vy = func(xp, yp, t, N_fields)
 
-    # remonta para grade 2D
-    Vx = Vx.reshape(X.shape)
-    Vy = Vy.reshape(Y.shape)
+    # converte de volta para CPU para o matplotlib streamplot
+    Vx = cp.asnumpy(Vx).reshape(X.shape)
+    Vy = cp.asnumpy(Vy).reshape(Y.shape)
 
     V = np.sqrt(Vx**2 + Vy**2)
 
@@ -68,13 +69,13 @@ def salvar_por_nivel(
 
         X, Y = np.meshgrid(x,y)
 
-        xp = X.ravel()
-        yp = Y.ravel()
+        xp = cp.asarray(X.ravel())
+        yp = cp.asarray(Y.ravel())
 
         Vx, Vy = func(xp, yp, t, N)
 
-        Vx = Vx.reshape(X.shape)
-        Vy = Vy.reshape(Y.shape)
+        Vx = cp.asnumpy(Vx).reshape(X.shape)
+        Vy = cp.asnumpy(Vy).reshape(Y.shape)
 
         V = np.sqrt(Vx**2 + Vy**2)
 

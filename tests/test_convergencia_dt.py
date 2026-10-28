@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+import cupy as cp
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -67,7 +68,7 @@ def executar_teste_convergencia_dt(
             temporal=temporal
         )
 
-        rs_final = rs[-1, :, :]
+        rs_final = cp.asnumpy(rs[-1, :, :])
         stats = calcular_estatisticas_trajetorias(ts, rs)
 
         resultados['dt'].append(dt)

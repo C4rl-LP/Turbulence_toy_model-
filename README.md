@@ -81,3 +81,20 @@ $$
 
 O modelo parado segue esta recursão porém com centros fixos e $t=0$
 
+
+
+## Instalação
+
+Instale NumPy e a variante CuPy compatível com o CUDA do computador (por exemplo, `cupy-cuda12x` para CUDA 12.x; use `cupy-cuda11x` para CUDA 11.x):
+
+```bash
+python -m pip install numpy cupy-cuda12x matplotlib
+```
+
+Execute a partir da raiz do repositório:
+
+```bash
+python campos.py
+```
+
+O código de simulação usa CuPy e requer uma GPU NVIDIA com driver/CUDA compatíveis.

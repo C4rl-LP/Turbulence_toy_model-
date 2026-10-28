@@ -1,4 +1,5 @@
 import numpy as np
+import cupy as cp
 import matplotlib.pyplot as plt
 from itertools import product
 
@@ -71,9 +72,9 @@ def x_centros(n, index, t):
 
 def centros_nivel_todos(n, t):
     """
-    Retorna array (N_centros, 2) com todos os centros do nível n
+    Retorna array (N_centros, 2) com todos os centros do nível n na GPU (CuPy)
     """
-    centros = np.array([x_1])  # nível 1
+    centros = cp.array([[0.0, 0.0]])  # nível 1
 
     for k in range(2, n+1):
 
@@ -81,16 +82,16 @@ def centros_nivel_todos(n, t):
         angle_base = Omega(k) * t
 
         # 4 possíveis fases
-        fases = np.array([
-            -np.pi/4,
-             np.pi/4,
-             3*np.pi/4,
-             5*np.pi/4
+        fases = cp.array([
+            -cp.pi/4,
+             cp.pi/4,
+             3*cp.pi/4,
+             5*cp.pi/4
         ])
 
-        deslocamentos = Rk * np.column_stack([
-            np.cos(angle_base + fases),
-            np.sin(angle_base + fases)
+        deslocamentos = Rk * cp.column_stack([
+            cp.cos(angle_base + fases),
+            cp.sin(angle_base + fases)
         ])
 
         # Produto cartesiano vetorizado
@@ -111,23 +112,24 @@ def atualiza_centro(cx, cy, t, n, idx):
     Rn = R(n)
     On = Omega(n)
 
-    phi_val = phi(n, idx)  # precisa aceitar array!
+    phi_val = np.pi/4 + (np.pi/2) * cp.asarray(idx)
 
-    shift_x = np.sqrt(2)*Rn * np.cos(On*t + phi_val)
-    shift_y = np.sqrt(2)*Rn * np.sin(On*t + phi_val)
+    shift_x = cp.sqrt(2)*Rn * cp.cos(On*t + phi_val)
+    shift_y = cp.sqrt(2)*Rn * cp.sin(On*t + phi_val)
 
     return cx + shift_x, cy + shift_y
 
 
 
-def subcentro(n,cx_0, cy_0,  t):
-    sub_cx = np.zeros(4)
-    sub_cy = np.zeros(4)
-    for i in range(4):
-        phi_i = np.pi/4 + np.pi/2 * i
-        sub_cx[i] =  cx_0 + R(n+1) *np.sqrt(2)*np.cos(Omega(n+1)*t + phi_i )
-        sub_cy[i] =  cy_0 + R(n+1) *np.sqrt(2)*np.sin(Omega(n+1)*t + phi_i )
-    return sub_cx, sub_cy       
+def subcentro(n, cx_0, cy_0, t):
+    """
+    Retorna arrays CuPy (4,) com as coordenadas (x, y) dos 4 subcentros
+    gerados no nível n+1 a partir de (cx_0, cy_0).
+    """
+    phi_vals = cp.pi/4 + (cp.pi/2) * cp.arange(4)
+    shift_x = R(n+1) * cp.sqrt(2) * cp.cos(Omega(n+1)*t + phi_vals)
+    shift_y = R(n+1) * cp.sqrt(2) * cp.sin(Omega(n+1)*t + phi_vals)
+    return cx_0 + shift_x, cy_0 + shift_y       
 
 def sondar(n, xp, yp, cx_0, cy_0, t):
     sub_cx, sub_cy = subcentro(n, cx_0, cy_0, t)
@@ -160,30 +162,29 @@ def verificar(N, xp, yp, t, x_0, y_0): # x_0, y_0 é  a coordenada do primeiro c
         centros.append(sub)
     return centros
 
-def sondar_vet(n,xp,yp,cx0,cy0,t):
- # agora 0,1,2,3
-    xp=np.atleast_1d(xp)
-    yp=np.atleast_1d(yp)
+def sondar_vet(n, xp, yp, cx0, cy0, t):
+    xp = cp.atleast_1d(cp.asarray(xp))
+    yp = cp.atleast_1d(cp.asarray(yp))
 
-    sub_cx,sub_cy = subcentro(
-        n,cx0,cy0,t
+    sub_cx, sub_cy = subcentro(
+        n, cx0, cy0, t
     )
 
     # (Np,4)
-    dx = xp[:,None]-sub_cx
-    dy = yp[:,None]-sub_cy
+    dx = xp[:, None] - sub_cx
+    dy = yp[:, None] - sub_cy
 
     mask = (
-        dx**2+dy**2
+        dx**2 + dy**2
         < (R_cufoff(n+1, alpha_padrao))**2
     )
 
-    return sub_cx,sub_cy,mask
+    return sub_cx, sub_cy, mask
 
 def verificar_vet(N,xp,yp,t,x0,y0):
 
-    xp=np.atleast_1d(xp)
-    yp=np.atleast_1d(yp)
+    xp=cp.atleast_1d(cp.asarray(xp))
+    yp=cp.atleast_1d(cp.asarray(yp))
 
     Np=len(xp)
 
@@ -208,8 +209,8 @@ def verificar_vet(N,xp,yp,t,x0,y0):
 
                 sub_cx,sub_cy,mask = sondar_vet(
                     n,
-                    np.array([xp[p]]),
-                    np.array([yp[p]]),
+                    xp[p:p+1],
+                    yp[p:p+1],
                     cx,
                     cy,
                     t

@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+import cupy as cp
 import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor
 
@@ -12,20 +13,20 @@ import funcoes_para_centros as fc
 from funcoes_para_centros import lamb
 
 
-def calcular_estatisticas_trajetorias(t: np.ndarray, rs: np.ndarray) -> dict:
+def calcular_estatisticas_trajetorias(t, rs) -> dict:
     """
-    Calcula séries temporais das principais estatísticas a partir das trajetórias.
+    Calcula séries temporais das principais estatísticas a partir das trajetórias na GPU (CuPy).
 
     Parâmetros
     ----------
     t : ndarray, shape (Nt,)
         Vetor de tempos.
     rs : ndarray, shape (Nt, N, 2)
-        Trajetórias das N partículas nos Nt passos de tempo.
+        Trajetórias das N partículas nos Nt passos de tempo (CuPy ou NumPy array).
 
     Retorna
     -------
-    dict com:
+    dict com séries temporais convertidas para NumPy para salvamento e plots:
         - 't': tempos
         - 'mean_x', 'mean_y': médias de x e y
         - 'var_x', 'var_y': variâncias amostrais de x e y
@@ -34,43 +35,46 @@ def calcular_estatisticas_trajetorias(t: np.ndarray, rs: np.ndarray) -> dict:
         - 'msd': deslocamento quadrático médio MSD(t) = < |r(t) - r(0)|^2 >
         - 'dist_media_trajetorias': distância média de cada partícula ao centroide
     """
-    Nt, N, _ = rs.shape
+    rs_gpu = cp.asarray(rs)
+    Nt, N, _ = rs_gpu.shape
 
-    mean_x = np.mean(rs[:, :, 0], axis=1)
-    mean_y = np.mean(rs[:, :, 1], axis=1)
+    mean_x = cp.mean(rs_gpu[:, :, 0], axis=1)
+    mean_y = cp.mean(rs_gpu[:, :, 1], axis=1)
 
     if N > 1:
-        var_x = np.var(rs[:, :, 0], axis=1, ddof=1)
-        var_y = np.var(rs[:, :, 1], axis=1, ddof=1)
-        cov_xy = np.zeros(Nt)
+        var_x = cp.var(rs_gpu[:, :, 0], axis=1, ddof=1)
+        var_y = cp.var(rs_gpu[:, :, 1], axis=1, ddof=1)
+        cov_xy = cp.zeros(Nt)
         for k in range(Nt):
-            cov_mat = np.cov(rs[k, :, 0], rs[k, :, 1], ddof=1)
+            cov_mat = cp.cov(rs_gpu[k, :, 0], rs_gpu[k, :, 1], ddof=1)
             cov_xy[k] = cov_mat[0, 1]
     else:
-        var_x = np.zeros(Nt)
-        var_y = np.zeros(Nt)
-        cov_xy = np.zeros(Nt)
+        var_x = cp.zeros(Nt)
+        var_y = cp.zeros(Nt)
+        cov_xy = cp.zeros(Nt)
 
     # sigma^2(t) = < |r(t) - <r(t)>|^2 >
-    mean_vec = np.column_stack((mean_x, mean_y))  # shape (Nt, 2)
-    dev = rs - mean_vec[:, None, :]  # shape (Nt, N, 2)
-    sigma2 = np.mean(np.sum(dev**2, axis=2), axis=1)
-    dist_centroide = np.mean(np.sqrt(np.sum(dev**2, axis=2)), axis=1)
+    mean_vec = cp.column_stack((mean_x, mean_y))  # shape (Nt, 2)
+    dev = rs_gpu - mean_vec[:, None, :]  # shape (Nt, N, 2)
+    sigma2 = cp.mean(cp.sum(dev**2, axis=2), axis=1)
+    dist_centroide = cp.mean(cp.sqrt(cp.sum(dev**2, axis=2)), axis=1)
 
     # MSD(t) = < |r(t) - r(0)|^2 >
-    disp = rs - rs[0:1, :, :]  # shape (Nt, N, 2)
-    msd = np.mean(np.sum(disp**2, axis=2), axis=1)
+    disp = rs_gpu - rs_gpu[0:1, :, :]  # shape (Nt, N, 2)
+    msd = cp.mean(cp.sum(disp**2, axis=2), axis=1)
+
+    t_cpu = cp.asnumpy(t) if isinstance(t, cp.ndarray) else np.asarray(t)
 
     return {
-        't': t,
-        'mean_x': mean_x,
-        'mean_y': mean_y,
-        'var_x': var_x,
-        'var_y': var_y,
-        'cov_xy': cov_xy,
-        'sigma2': sigma2,
-        'msd': msd,
-        'dist_media_trajetorias': dist_centroide
+        't': t_cpu,
+        'mean_x': cp.asnumpy(mean_x),
+        'mean_y': cp.asnumpy(mean_y),
+        'var_x': cp.asnumpy(var_x),
+        'var_y': cp.asnumpy(var_y),
+        'cov_xy': cp.asnumpy(cov_xy),
+        'sigma2': cp.asnumpy(sigma2),
+        'msd': cp.asnumpy(msd),
+        'dist_media_trajetorias': cp.asnumpy(dist_centroide)
     }
 
 
@@ -128,17 +132,18 @@ def calcular_estatisticas_distribuicao(data: np.ndarray) -> dict:
     """
     Calcula momento de ordem superior, quantis e estatísticas de uma distribuição 1D.
     """
+    data_cpu = cp.asnumpy(data) if isinstance(data, cp.ndarray) else np.asarray(data)
     return {
-        'mean': float(np.mean(data)),
-        'std': float(np.std(data, ddof=1)) if len(data) > 1 else 0.0,
-        'var': float(np.var(data, ddof=1)) if len(data) > 1 else 0.0,
-        'assimetria': float(calcular_assimetria(data)),
-        'curtose': float(calcular_curtose(data)),
-        'q05': float(np.quantile(data, 0.05)),
-        'q25': float(np.quantile(data, 0.25)),
-        'q50': float(np.quantile(data, 0.50)),
-        'q75': float(np.quantile(data, 0.75)),
-        'q95': float(np.quantile(data, 0.95))
+        'mean': float(np.mean(data_cpu)),
+        'std': float(np.std(data_cpu, ddof=1)) if len(data_cpu) > 1 else 0.0,
+        'var': float(np.var(data_cpu, ddof=1)) if len(data_cpu) > 1 else 0.0,
+        'assimetria': float(calcular_assimetria(data_cpu)),
+        'curtose': float(calcular_curtose(data_cpu)),
+        'q05': float(np.quantile(data_cpu, 0.05)),
+        'q25': float(np.quantile(data_cpu, 0.25)),
+        'q50': float(np.quantile(data_cpu, 0.50)),
+        'q75': float(np.quantile(data_cpu, 0.75)),
+        'q95': float(np.quantile(data_cpu, 0.95))
     }
 
 
@@ -151,9 +156,10 @@ def gerar_histogramas_completos(
     """
     Gera e salva histogramas 1D de x, 1D de y e 2D de (x, y).
     """
+    rs_cpu = cp.asnumpy(rs_final) if isinstance(rs_final, cp.ndarray) else np.asarray(rs_final)
     os.makedirs(output_dir, exist_ok=True)
-    x = rs_final[:, 0]
-    y = rs_final[:, 1]
+    x = rs_cpu[:, 0]
+    y = rs_cpu[:, 1]
 
     # Histogramas 1D
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
@@ -199,46 +205,48 @@ def simular_estocastico_com_perturbacao(
     seed: int = 42
 ) -> tuple[np.ndarray, np.ndarray]:
     """
-    Simula N partículas sob dinâmica estocástica com perturbação inicial delta_r:
+    Simula N partículas sob dinâmica estocástica com perturbação inicial delta_r na GPU (CuPy):
         dr = V_N(r, t) dt + dW
         r(0) = r0 + delta_r
     """
-    rng = np.random.default_rng(seed)
-    r0 = np.asarray(r0, dtype=float).reshape(-1)
+    cp.random.seed(seed)
+    r0_gpu = cp.asarray(r0, dtype=float).reshape(-1)
 
-    theta = rng.uniform(0, 2 * np.pi, size=N)
-    u = rng.uniform(0, 1, size=N)
-    r_rand = delta_r * np.sqrt(u)
+    theta = cp.random.uniform(0, 2 * cp.pi, size=N)
+    u = cp.random.uniform(0, 1, size=N)
+    r_rand = delta_r * cp.sqrt(u)
 
-    dx = r_rand * np.cos(theta)
-    dy = r_rand * np.sin(theta)
+    dx = r_rand * cp.cos(theta)
+    dy = r_rand * cp.sin(theta)
 
-    particle_t0 = r0 + np.column_stack((dx, dy))
+    particle_t0 = r0_gpu + cp.column_stack((dx, dy))
 
     dt_N = dt_1 / (lamb_val ** (N_fields - 1))
     N_steps = int(np.ceil(t_max / dt_N))
     dt_N = t_max / N_steps
     t = np.linspace(0.0, t_max, N_steps + 1)
 
-    rs = np.empty((N_steps + 1, N, 2))
+    rs = cp.empty((N_steps + 1, N, 2), dtype=float)
     rs[0] = particle_t0
 
+    if func is None:
+        func = campos.campo_total_podado
+
     for k in range(N_steps):
-        tk = t[k]
+        tk = float(t[k])
         x = rs[k, :, 0]
         y = rs[k, :, 1]
-
-        if func is None:
-            func = campos.campo_total_podado
 
         if temporal:
             Vx, Vy = func(x, y, tk, N_fields)
         else:
-            Vx, Vy = func(x, y, 0, N_fields)
+            Vx, Vy = func(x, y, 0.0, N_fields)
 
-        V = np.column_stack((Vx, Vy))
-        dW = np.sqrt(dt_N) * rng.normal(size=(N, 2))
+        V = cp.column_stack((Vx, Vy))
+        dW = cp.sqrt(dt_N) * cp.random.normal(size=(N, 2))
         rs[k + 1] = rs[k] + V * dt_N + dW
+
+    return t, rs
 
     return t, rs
 

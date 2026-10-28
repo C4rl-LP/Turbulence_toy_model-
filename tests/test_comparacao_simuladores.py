@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+import cupy as cp
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -65,11 +66,15 @@ def executar_teste_comparacao_simuladores(
     )
     stats_estoc = calcular_estatisticas_trajetorias(ts_estoc, rs_estoc)
 
+    # Conversão para CPU para salvar e plotar
+    rs_det_cpu = cp.asnumpy(rs_det)
+    rs_estoc_cpu = cp.asnumpy(rs_estoc)
+
     # Salvar dados brutos
     np.savez_compressed(
         os.path.join(output_dir, "comparacao_simuladores_dados.npz"),
-        ts_det=ts_det, rs_det=rs_det,
-        ts_estoc=ts_estoc, rs_estoc=rs_estoc,
+        ts_det=ts_det, rs_det=rs_det_cpu,
+        ts_estoc=ts_estoc, rs_estoc=rs_estoc_cpu,
         stats_det=stats_det,
         stats_estoc=stats_estoc
     )
@@ -79,8 +84,8 @@ def executar_teste_comparacao_simuladores(
     # A) Trajetórias comparadas
     plt.figure(figsize=(7, 7))
     for i in range(min(50, N_particulas)):
-        plt.plot(rs_det[:, i, 0], rs_det[:, i, 1], 'b-', alpha=0.3, lw=0.8, label='Determinístico' if i == 0 else "")
-        plt.plot(rs_estoc[:, i, 0], rs_estoc[:, i, 1], 'r-', alpha=0.3, lw=0.8, label='Estocástico' if i == 0 else "")
+        plt.plot(rs_det_cpu[:, i, 0], rs_det_cpu[:, i, 1], 'b-', alpha=0.3, lw=0.8, label='Determinístico' if i == 0 else "")
+        plt.plot(rs_estoc_cpu[:, i, 0], rs_estoc_cpu[:, i, 1], 'r-', alpha=0.3, lw=0.8, label='Estocástico' if i == 0 else "")
     plt.scatter(r0[0], r0[1], c='black', marker='x', s=100, label='r0')
     plt.xlabel('x')
     plt.ylabel('y')
@@ -94,13 +99,13 @@ def executar_teste_comparacao_simuladores(
 
     # B) Distribuição final comparada
     fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharex=True, sharey=True)
-    axes[0].scatter(rs_det[-1, :, 0], rs_det[-1, :, 1], color='blue', alpha=0.5, s=15)
+    axes[0].scatter(rs_det_cpu[-1, :, 0], rs_det_cpu[-1, :, 1], color='blue', alpha=0.5, s=15)
     axes[0].set_title('Distribuição Final - Determinístico')
     axes[0].set_xlabel('x')
     axes[0].set_ylabel('y')
     axes[0].grid(True, alpha=0.3)
 
-    axes[1].scatter(rs_estoc[-1, :, 0], rs_estoc[-1, :, 1], color='red', alpha=0.5, s=15)
+    axes[1].scatter(rs_estoc_cpu[-1, :, 0], rs_estoc_cpu[-1, :, 1], color='red', alpha=0.5, s=15)
     axes[1].set_title('Distribuição Final - Estocástico')
     axes[1].set_xlabel('x')
     axes[1].grid(True, alpha=0.3)
