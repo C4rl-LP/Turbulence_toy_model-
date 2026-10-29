@@ -124,7 +124,7 @@ def campo_total_correto(
             Vy += vy
 
     return Vx, Vy
-def campo_total_podado(
+def campo_total_podado_referencia(
     xp: cp.ndarray | float,
     yp: cp.ndarray | float,
     t: float,
@@ -199,6 +199,34 @@ def campo_total_podado(
     if xp_is_scalar and yp_is_scalar:
         return float(vx_total[0]), float(vy_total[0])
     return vx_total, vy_total
+
+
+def campo_total_podado(
+    xp: cp.ndarray | float,
+    yp: cp.ndarray | float,
+    t: float,
+    n_max: int = 3,
+    c: float = c_padrao,
+    alpha: float = alpha_padrao
+) -> tuple[cp.ndarray, cp.ndarray]:
+    """Campo podado em paralelo; conserva a referência para outros dtypes/formas.
+
+    O caminho float64 1D não extrai escalares GPU nem compacta máscaras.
+    A interface escalar continua retornando floats e portanto sincroniza.
+    """
+    if not hasattr(cp, 'RawKernel'):  # referência NumPy do diagnóstico
+        return campo_total_podado_referencia(xp, yp, t, n_max, c, alpha)
+    x = cp.atleast_1d(cp.asarray(xp))
+    y = cp.atleast_1d(cp.asarray(yp))
+    if (x.ndim != 1 or y.ndim != 1 or x.shape != y.shape
+            or x.dtype != cp.float64 or y.dtype != cp.float64):
+        return campo_total_podado_referencia(xp, yp, t, n_max, c, alpha)
+    from campo_gpu import evaluate
+    vx, vy = evaluate(x, y,
+                      t, n_max, c, alpha)
+    if cp.isscalar(xp) and cp.isscalar(yp):
+        return float(vx[0]), float(vy[0])
+    return vx, vy
 
 
 if __name__ =="__main__":

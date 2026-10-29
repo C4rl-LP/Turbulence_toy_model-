@@ -39,7 +39,7 @@ def main():
         ],
         help="Nome do teste a ser executado."
     )
-    parser.add_argument("--N_particulas", type=int, default=10000, help="Número de partículas / realizações.")
+    parser.add_argument("--N_particulas", type=int, default=60000, help="Número de partículas / realizações.")
     parser.add_argument("--t_max", type=float, default=1/5, help="Tempo máximo de simulação.")
     parser.add_argument("--seed", type=int, default=42, help="Semente de números aleatórios.")
 
@@ -51,11 +51,11 @@ def main():
 
 
     if args.teste in ["todos", "estocasticidade"]:
-        executar_teste_estocasticidade(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed, lista_N_fields=(1,2,3,4,5,6,7,8))
+        executar_teste_estocasticidade(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed, lista_N_fields=(1,2,3), temporal = True)
 
     if args.teste in ["todos", "estocasticidade_parametros"]:
         for i in range(8):
-            executar_teste_estocasticidade_parametros(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed, N_fields=i)
+            executar_teste_estocasticidade_parametros(N_particulas=args.N_particulas, t_max=args.t_max, seed=args.seed, N_fields=i, temporal = True)
 
     print("\nExecução concluída! Todos os resultados e gráficos foram salvos na pasta 'resultados/'.\n")
 

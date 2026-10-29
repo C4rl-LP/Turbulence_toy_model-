@@ -1,0 +1,74 @@
+{
+  "kernels": 32820,
+  "kernel_sum_ms": 52.807763,
+  "kernel_active_union_ms": 52.807763,
+  "kernel_span_ms": 489.075007,
+  "kernel_active_fraction": 0.10797477328462217,
+  "single_block_fraction": 1.0,
+  "max_grid_blocks": 1,
+  "small_block_le_8_threads": 23993,
+  "api": {
+    "cuLaunchKernel": {
+      "calls": 30772,
+      "host_ms": 64.398108
+    },
+    "cuProfilerStart": {
+      "calls": 1,
+      "host_ms": 0.006869
+    },
+    "cudaEventCreateWithFlags_v3020": {
+      "calls": 1024,
+      "host_ms": 0.328002
+    },
+    "cudaEventDestroy_v3020": {
+      "calls": 1024,
+      "host_ms": 0.367968
+    },
+    "cudaEventQuery_v3020": {
+      "calls": 2047,
+      "host_ms": 0.751367
+    },
+    "cudaEventRecord_v3020": {
+      "calls": 1024,
+      "host_ms": 1.098228
+    },
+    "cudaLaunchKernel_v7000": {
+      "calls": 2048,
+      "host_ms": 5.057261
+    },
+    "cudaMemcpyAsync_v3020": {
+      "calls": 7317,
+      "host_ms": 54.780377
+    },
+    "cudaMemsetAsync_v3020": {
+      "calls": 49,
+      "host_ms": 0.166178
+    },
+    "cudaStreamIsCapturing_v10000": {
+      "calls": 7312,
+      "host_ms": 1.629158
+    },
+    "cudaStreamSynchronize_v3020": {
+      "calls": 6289,
+      "host_ms": 3.782496
+    }
+  },
+  "copies": {
+    "1": {
+      "count": 1024,
+      "bytes": 8192,
+      "gpu_ms": 0.821797
+    },
+    "2": {
+      "count": 6288,
+      "bytes": 22032,
+      "gpu_ms": 6.188208
+    },
+    "8": {
+      "count": 5,
+      "bytes": 2560,
+      "gpu_ms": 0.006847
+    }
+  },
+  "note": "copyKind CUDA: 1=H2D, 2=D2H, 8=D2D; fra\u00e7\u00e3o temporal n\u00e3o \u00e9 ocupa\u00e7\u00e3o SM"
+}
