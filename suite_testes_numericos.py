@@ -1,7 +1,7 @@
 import os
 import time
 import numpy as np
-import matplotlib.pyplot as plt
+from tests.dados_resultados import salvar_npz
 
 import integradores as it
 import campos
@@ -208,19 +208,9 @@ def teste_1_convergencia_temporal(
         resultados['sigma2'].append(sigma2)
         resultados['distribuicoes_finais'].append(rs_final)
 
-        # Histograma 2D final para este dt
-        plt.figure(figsize=(6, 5))
-        plt.hist2d(rs_final[:, 0], rs_final[:, 1], bins=40, density=True, cmap='viridis')
-        plt.colorbar(label='Densidade de probabilidade')
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.title(f'Distribuição 2D final (dt = {dt:.5e})')
-        plt.tight_layout()
-        plt.savefig(os.path.join(output_dir, f'distribuicao_2d_dt_{idx+1}.png'), dpi=200)
-        plt.close()
 
     # Salvar dados numéricos
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "convergencia_temporal.npz"),
         dt=np.array(resultados['dt']),
         mean_x=np.array(resultados['mean_x']),
@@ -229,51 +219,9 @@ def teste_1_convergencia_temporal(
         var_y=np.array(resultados['var_y']),
         cov_xy=np.array(resultados['cov_xy']),
         sigma2=np.array(resultados['sigma2']),
-        distribuicoes_finais=np.array(resultados['distribuicoes_finais'], dtype=object)
+        distribuicoes_finais=np.asarray(resultados['distribuicoes_finais'], dtype=float)
     )
 
-    # Gráficos das estatísticas vs dt
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-
-    dts = np.array(resultados['dt'])
-
-    axes[0, 0].plot(dts, resultados['mean_x'], 'o-', label='<x>')
-    axes[0, 0].plot(dts, resultados['mean_y'], 's-', label='<y>')
-    axes[0, 0].set_xlabel('dt')
-    axes[0, 0].set_ylabel('Média Final')
-    axes[0, 0].set_xscale('log')
-    axes[0, 0].grid(True, alpha=0.3)
-    axes[0, 0].legend()
-    axes[0, 0].set_title('Média final vs dt')
-
-    axes[0, 1].plot(dts, resultados['var_x'], 'o-', label='Var[x]')
-    axes[0, 1].plot(dts, resultados['var_y'], 's-', label='Var[y]')
-    axes[0, 1].set_xlabel('dt')
-    axes[0, 1].set_ylabel('Variância Final')
-    axes[0, 1].set_xscale('log')
-    axes[0, 1].grid(True, alpha=0.3)
-    axes[0, 1].legend()
-    axes[0, 1].set_title('Variância final vs dt')
-
-    axes[1, 0].plot(dts, resultados['cov_xy'], 'd-r', label='Cov[x,y]')
-    axes[1, 0].set_xlabel('dt')
-    axes[1, 0].set_ylabel('Covariância')
-    axes[1, 0].set_xscale('log')
-    axes[1, 0].grid(True, alpha=0.3)
-    axes[1, 0].legend()
-    axes[1, 0].set_title('Covariância vs dt')
-
-    axes[1, 1].plot(dts, resultados['sigma2'], '^-g', label=r'$\sigma^2$ total')
-    axes[1, 1].set_xlabel('dt')
-    axes[1, 1].set_ylabel(r'$\sigma^2$')
-    axes[1, 1].set_xscale('log')
-    axes[1, 1].grid(True, alpha=0.3)
-    axes[1, 1].legend()
-    axes[1, 1].set_title(r'$\sigma^2$ total vs dt')
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'estatisticas_vs_dt.png'), dpi=200)
-    plt.close()
 
     return resultados
 
@@ -356,7 +304,7 @@ def teste_2_escala_temporal_N(
         dados['sigma2'].append(sigma2)
 
     # Salvar em .npz
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "escala_temporal_N.npz"),
         N_fields=np.array(dados['N_fields']),
         dt_N=np.array(dados['dt_N']),
@@ -379,66 +327,17 @@ def teste_2_escala_temporal_N(
     ])
     np.savetxt(os.path.join(output_dir, "escala_temporal_N.csv"), matrix_data, delimiter=",", header=header, comments="")
 
-    # Gerar gráficos separados
     N_arr = np.array(dados['N_fields'])
 
     # 1. dt_N vs N
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['dt_N'], 'o-b')
-    plt.yscale('log')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel('dt_N (escala log)')
-    plt.title('Passo temporal dt_N vs N')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'dt_N_vs_N.png'), dpi=200)
-    plt.close()
 
     # 2. Número de passos vs N
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['num_passos'], 's-g')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel('Número de passos temporais')
-    plt.title('Número de passos vs N')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'num_passos_vs_N.png'), dpi=200)
-    plt.close()
 
     # 3. sigma² vs N
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['sigma2'], '^-r')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel(r'$\sigma^2$ total final')
-    plt.title(r'$\sigma^2$ total final vs N')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'sigma2_vs_N.png'), dpi=200)
-    plt.close()
 
     # 4. Variância em x e y vs N
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['var_x'], 'o-', label='Var[x]')
-    plt.plot(N_arr, dados['var_y'], 's-', label='Var[y]')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel('Variância final')
-    plt.title('Variância final em x e y vs N')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'variancia_x_y_vs_N.png'), dpi=200)
-    plt.close()
 
     # 5. Custo computacional vs N
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['tempo_computacional'], 'd-m')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel('Tempo de execução (segundos)')
-    plt.title('Custo computacional vs N')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'custo_computacional_vs_N.png'), dpi=200)
-    plt.close()
 
     return dados
 
@@ -518,23 +417,11 @@ def teste_3_estocasticidade_espontanea(
             res_n['dispersao_media'].append(disp_media)
             res_n['distribuicoes_finais'].append(rs_final)
 
-            # Histograma/Scatter da distribuição final para cada delta_r
-            plt.figure(figsize=(6, 5))
-            plt.scatter(rs_final[:, 0], rs_final[:, 1], alpha=0.5, s=10, c='blue', label=f'Final (dr={delta_r:.1e})')
-            plt.scatter(r0[0], r0[1], c='red', marker='x', s=80, label='r0')
-            plt.xlabel('x')
-            plt.ylabel('y')
-            plt.title(f'Distribuição final (N_fields={n}, dr={delta_r:.1e})')
-            plt.legend()
-            plt.grid(True, alpha=0.3)
-            plt.tight_layout()
-            plt.savefig(os.path.join(sub_dir, f'distribuicao_delta_r_{d_idx+1}.png'), dpi=200)
-            plt.close()
 
         resultados_globais[f'N_{n}'] = res_n
 
         # Salvar npz para N_fields = n
-        np.savez_compressed(
+        salvar_npz(
             os.path.join(sub_dir, f"estocasticidade_espontanea_N_{n}.npz"),
             delta_r=np.array(res_n['delta_r']),
             mean_x=np.array(res_n['mean_x']),
@@ -543,49 +430,11 @@ def teste_3_estocasticidade_espontanea(
             var_y=np.array(res_n['var_y']),
             sigma2=np.array(res_n['sigma2']),
             dispersao_media=np.array(res_n['dispersao_media']),
-            distribuicoes_finais=np.array(res_n['distribuicoes_finais'], dtype=object)
+            distribuicoes_finais=np.asarray(res_n['distribuicoes_finais'], dtype=float)
         )
 
-        # Gráficos em função de delta_r para o nível n
         deltas = np.array(res_n['delta_r'])
 
-        plt.figure(figsize=(6, 5))
-        plt.plot(deltas, res_n['dispersao_media'], 'o-b')
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.xlabel(r'$\delta r$ inicial')
-        plt.ylabel('Dispersão média final')
-        plt.title(fr'Dispersão final vs $\delta r$ (N_fields={n})')
-        plt.grid(True, alpha=0.3)
-        plt.tight_layout()
-        plt.savefig(os.path.join(sub_dir, 'dispersao_vs_delta_r.png'), dpi=200)
-        plt.close()
-
-        plt.figure(figsize=(6, 5))
-        plt.plot(deltas, res_n['var_x'], 'o-', label='Var[x]')
-        plt.plot(deltas, res_n['var_y'], 's-', label='Var[y]')
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.xlabel(r'$\delta r$ inicial')
-        plt.ylabel('Variância final')
-        plt.title(fr'Variância final vs $\delta r$ (N_fields={n})')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.tight_layout()
-        plt.savefig(os.path.join(sub_dir, 'variancia_vs_delta_r.png'), dpi=200)
-        plt.close()
-
-        plt.figure(figsize=(6, 5))
-        plt.plot(deltas, res_n['sigma2'], '^-r')
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.xlabel(r'$\delta r$ inicial')
-        plt.ylabel(r'$\sigma^2$ total final')
-        plt.title(fr'$\sigma^2$ final vs $\delta r$ (N_fields={n})')
-        plt.grid(True, alpha=0.3)
-        plt.tight_layout()
-        plt.savefig(os.path.join(sub_dir, 'sigma2_vs_delta_r.png'), dpi=200)
-        plt.close()
 
     return resultados_globais
 
@@ -663,7 +512,7 @@ def teste_4_separar_ruidos(
     stats_C = calcular_estatisticas_trajetorias(ts_C, rs_C)
 
     # Salvar resultados
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "comparacao_ruidos.npz"),
         t_A=ts_A, rs_A=rs_A,
         t_B=ts_B, rs_B=rs_B,
@@ -676,72 +525,14 @@ def teste_4_separar_ruidos(
         dist_C=stats_C['dist_media_trajetorias']
     )
 
-    # Gráficos comparativos
 
     # 1. Variância em x e y vs t
-    plt.figure(figsize=(8, 5))
-    plt.plot(ts_A, stats_A['var_x'], label='A (Det + pert. inic.) - Var[x]', color='blue', linestyle='--')
-    plt.plot(ts_B, stats_B['var_x'], label='B (Estoc. sem pert.) - Var[x]', color='green', linestyle='-.')
-    plt.plot(ts_C, stats_C['var_x'], label='C (Estoc. + pert.) - Var[x]', color='red', linestyle='-')
-    plt.xlabel('Tempo t')
-    plt.ylabel('Variância em x')
-    plt.title('Comparação de Variância Var[x](t)')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'comparacao_variancia_x.png'), dpi=200)
-    plt.close()
 
     # 2. sigma² total vs t
-    plt.figure(figsize=(8, 5))
-    plt.plot(ts_A, stats_A['sigma2'], label='A (Det + pert. inic.)', color='blue', linestyle='--')
-    plt.plot(ts_B, stats_B['sigma2'], label='B (Estoc. sem pert.)', color='green', linestyle='-.')
-    plt.plot(ts_C, stats_C['sigma2'], label='C (Estoc. + pert.)', color='red', linestyle='-')
-    plt.xlabel('Tempo t')
-    plt.ylabel(r'$\sigma^2(t)$ total')
-    plt.title(r'Comparação de $\sigma^2(t)$ Total')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'comparacao_sigma2.png'), dpi=200)
-    plt.close()
 
     # 3. Distância média entre trajetórias vs t
-    plt.figure(figsize=(8, 5))
-    plt.plot(ts_A, stats_A['dist_media_trajetorias'], label='A (Det + pert. inic.)', color='blue', linestyle='--')
-    plt.plot(ts_B, stats_B['dist_media_trajetorias'], label='B (Estoc. sem pert.)', color='green', linestyle='-.')
-    plt.plot(ts_C, stats_C['dist_media_trajetorias'], label='C (Estoc. + pert.)', color='red', linestyle='-')
-    plt.xlabel('Tempo t')
-    plt.ylabel('Distância média ao centroide')
-    plt.title('Distância média entre trajetórias')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'comparacao_distancia_trajetorias.png'), dpi=200)
-    plt.close()
 
     # 4. Distribuições finais comparadas
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharex=True, sharey=True)
-
-    axes[0].scatter(rs_A[-1, :, 0], rs_A[-1, :, 1], alpha=0.5, s=12, color='blue')
-    axes[0].set_title('A: Det. + perturbação')
-    axes[0].set_xlabel('x')
-    axes[0].set_ylabel('y')
-    axes[0].grid(True, alpha=0.3)
-
-    axes[1].scatter(rs_B[-1, :, 0], rs_B[-1, :, 1], alpha=0.5, s=12, color='green')
-    axes[1].set_title('B: Estocástico puro')
-    axes[1].set_xlabel('x')
-    axes[1].grid(True, alpha=0.3)
-
-    axes[2].scatter(rs_C[-1, :, 0], rs_C[-1, :, 1], alpha=0.5, s=12, color='red')
-    axes[2].set_title('C: Estoc. + perturbação')
-    axes[2].set_xlabel('x')
-    axes[2].grid(True, alpha=0.3)
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'comparacao_distribuicoes_finais.png'), dpi=200)
-    plt.close()
 
     return {'stats_A': stats_A, 'stats_B': stats_B, 'stats_C': stats_C}
 
@@ -790,7 +581,7 @@ def teste_5_estatisticas_temporais(
         series_temporais_n[n] = stats
 
         # Salvar série temporal individual do nível n
-        np.savez_compressed(
+        salvar_npz(
             os.path.join(output_dir, f"series_temporais_N_{n}.npz"),
             t=ts,
             mean_x=stats['mean_x'],
@@ -801,31 +592,6 @@ def teste_5_estatisticas_temporais(
             sigma2=stats['sigma2'],
             msd=stats['msd']
         )
-
-    # Criar gráficos comparativos das séries temporais entre níveis N_fields
-    figuras_info = [
-        ('mean_x', 'Média <x>(t)', 'media_x_vs_t.png'),
-        ('mean_y', 'Média <y>(t)', 'media_y_vs_t.png'),
-        ('var_x', 'Variância Var[x](t)', 'variancia_x_vs_t.png'),
-        ('var_y', 'Variância Var[y](t)', 'variancia_y_vs_t.png'),
-        ('cov_xy', 'Covariância Cov[x,y](t)', 'covariancia_vs_t.png'),
-        ('sigma2', r'$\sigma^2(t)$ Total', 'sigma2_vs_t.png'),
-        ('msd', 'MSD(t)', 'msd_vs_t.png')
-    ]
-
-    for chave, titulo, filename in figuras_info:
-        plt.figure(figsize=(7, 5))
-        for n in lista_N_fields:
-            st = series_temporais_n[n]
-            plt.plot(st['t'], st[chave], label=f'N_fields = {n}')
-        plt.xlabel('Tempo t')
-        plt.ylabel(titulo)
-        plt.title(f'{titulo} vs t')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.tight_layout()
-        plt.savefig(os.path.join(output_dir, filename), dpi=200)
-        plt.close()
 
     return series_temporais_n
 

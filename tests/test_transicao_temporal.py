@@ -1,9 +1,9 @@
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 import funcoes_para_centros as fc
@@ -44,6 +44,7 @@ def executar_teste_transicao_temporal(
     8. Teste de dependência temporal do campo com temporal=True.
     Varre um parâmetro de controle e analisa possíveis transições de regime / aumentos de dispersão.
     """
+    temporal = True  # Campo já fixado como temporal na chamada existente; registra no JSON.
     os.makedirs(output_dir, exist_ok=True)
 
     print("=" * 60)
@@ -92,7 +93,7 @@ def executar_teste_transicao_temporal(
             dados_transicao['resultados_por_N'][n]['dist_media_final'].append(stats['dist_media_trajetorias'][-1])
 
     # Salvar dados brutos
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "transicao_temporal_dados.npz"),
         param_nome=param_nome,
         param_valores=np.array(lista_param_valores),
@@ -100,49 +101,12 @@ def executar_teste_transicao_temporal(
         dados_por_N=dados_transicao['resultados_por_N']
     )
 
-    # Gráficos dos Observáveis vs Parâmetro de Controle
 
     # 1. sigma² final vs Parâmetro de Controle
-    plt.figure(figsize=(7, 5))
-    for n in lista_N_fields:
-        sigma2_vals = dados_transicao['resultados_por_N'][n]['sigma2_final']
-        plt.plot(lista_param_valores, sigma2_vals, 'o-', label=f'N_fields = {n}')
-    plt.xlabel(f'Parâmetro de controle ({param_nome})')
-    plt.ylabel(r'$\sigma^2$ total final')
-    plt.title(fr'Dispersão $\sigma^2$ vs Parâmetro {param_nome}')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'sigma2_vs_parametro.png'), dpi=200)
-    plt.close()
 
     # 2. MSD final vs Parâmetro de Controle
-    plt.figure(figsize=(7, 5))
-    for n in lista_N_fields:
-        msd_vals = dados_transicao['resultados_por_N'][n]['msd_final']
-        plt.plot(lista_param_valores, msd_vals, 's-', label=f'N_fields = {n}')
-    plt.xlabel(f'Parâmetro de controle ({param_nome})')
-    plt.ylabel('MSD final')
-    plt.title(f'MSD final vs Parâmetro {param_nome}')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'msd_vs_parametro.png'), dpi=200)
-    plt.close()
 
     # 3. Distância Média vs Parâmetro de Controle
-    plt.figure(figsize=(7, 5))
-    for n in lista_N_fields:
-        dist_vals = dados_transicao['resultados_por_N'][n]['dist_media_final']
-        plt.plot(lista_param_valores, dist_vals, '^-', label=f'N_fields = {n}')
-    plt.xlabel(f'Parâmetro de controle ({param_nome})')
-    plt.ylabel('Distância média ao centroide')
-    plt.title(f'Dispersão espacial vs Parâmetro {param_nome}')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'distancia_vs_parametro.png'), dpi=200)
-    plt.close()
 
     print("\nRESUMO QUANTITATIVO DA VARREDURA DE PARÂMETRO:")
     print(f"{param_nome:<12}{'N':<5}{'sigma2_final':<15}{'MSD_final':<15}")

@@ -1,9 +1,9 @@
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 from funcoes_para_centros import lamb
@@ -68,7 +68,7 @@ def executar_teste_robustez(
         dados_robustez['msd'].append(stats['msd'][-1])
 
     # Salvar dados brutos
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "robustez_estatistica_dados.npz"),
         N_particulas=np.array(lista_N_particulas),
         mean_x=np.array(dados_robustez['mean_x']),
@@ -79,52 +79,8 @@ def executar_teste_robustez(
         msd=np.array(dados_robustez['msd'])
     )
 
-    # Gráficos da convergência das estimativas vs N_particulas
     n_pts = np.array(lista_N_particulas)
 
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-
-    # 1. Média vs N_particulas
-    axes[0, 0].plot(n_pts, dados_robustez['mean_x'], 'o-b', label='<x>')
-    axes[0, 0].plot(n_pts, dados_robustez['mean_y'], 's-r', label='<y>')
-    axes[0, 0].set_xscale('log')
-    axes[0, 0].set_xlabel('Número de partículas N_particulas')
-    axes[0, 0].set_ylabel('Média final')
-    axes[0, 0].set_title('Convergência da Média vs N_particulas')
-    axes[0, 0].grid(True, alpha=0.3)
-    axes[0, 0].legend()
-
-    # 2. Variância vs N_particulas
-    axes[0, 1].plot(n_pts, dados_robustez['var_x'], 'o-b', label='Var[x]')
-    axes[0, 1].plot(n_pts, dados_robustez['var_y'], 's-r', label='Var[y]')
-    axes[0, 1].set_xscale('log')
-    axes[0, 1].set_xlabel('Número de partículas N_particulas')
-    axes[0, 1].set_ylabel('Variância final')
-    axes[0, 1].set_title('Convergência da Variância vs N_particulas')
-    axes[0, 1].grid(True, alpha=0.3)
-    axes[0, 1].legend()
-
-    # 3. sigma² vs N_particulas
-    axes[1, 0].plot(n_pts, dados_robustez['sigma2'], '^-g', label=r'$\sigma^2$ total')
-    axes[1, 0].set_xscale('log')
-    axes[1, 0].set_xlabel('Número de partículas N_particulas')
-    axes[1, 0].set_ylabel(r'$\sigma^2$ final')
-    axes[1, 0].set_title(r'Convergência de $\sigma^2$ vs N_particulas')
-    axes[1, 0].grid(True, alpha=0.3)
-    axes[1, 0].legend()
-
-    # 4. MSD vs N_particulas
-    axes[1, 1].plot(n_pts, dados_robustez['msd'], 'd-m', label='MSD')
-    axes[1, 1].set_xscale('log')
-    axes[1, 1].set_xlabel('Número de partículas N_particulas')
-    axes[1, 1].set_ylabel('MSD final')
-    axes[1, 1].set_title('Convergência do MSD vs N_particulas')
-    axes[1, 1].grid(True, alpha=0.3)
-    axes[1, 1].legend()
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'convergencia_robustez.png'), dpi=200)
-    plt.close()
 
     print("\nRESUMO QUANTITATIVO DE ROBUSTEZ ESTATÍSTICA (t_max):")
     print(f"{'N_particulas':<15}{'<x>':<12}{'Var[x]':<15}{'sigma2':<15}{'MSD':<15}")

@@ -4,3 +4,12 @@ __pycache__/
 venv/
 env/
 .env
+
+# Figuras reconstruíveis; os arquivos já rastreados continuam no Git.
+/figuras/
+/resultados/**/*.png
+/resultados/**/*.pdf
+/resultados/**/*.svg
+/tests/resultados/**/*.png
+/tests/resultados/**/*.pdf
+/tests/resultados/**/*.svg

@@ -1,10 +1,9 @@
-import numpy as np 
+import numpy as np
 import cupy as cp
 import os
-from matplotlib import pyplot as plt
 import funcoes_para_centros as fc
 from funcoes_para_centros import R_1, O_1, lamb, x_1, T_1, alpha_padrao, c_padrao
-import time 
+import time
 
 def solve_RK4(func, r0, t0, dt, t_max):
     """
@@ -47,7 +46,7 @@ def solve_euler_maruyama(func, r0, t_max, dt):
     N_steps = int(np.ceil(t_max / dt))
     dt_real = t_max / N_steps
 
-    t = np.linspace(0.0, t_max, N_steps + 1)    
+    t = np.linspace(0.0, t_max, N_steps + 1)
 
     r = cp.empty((N_steps + 1, 2), dtype=float)
     r[0] = r0
@@ -95,7 +94,6 @@ def simular_particulas(N, N_fields, dimensao_quadrado, r0, dt=0.01, t_max=1, fun
 
     t, r = solve_RK4(funcao, particle_t0, 0.0, dt, t_max)
     return t, r
-
 
 
 def simular_particulas_ruidosa(
@@ -152,8 +150,6 @@ def simular_particulas_ruidosa(
     return t, rs
 
 
-
-
 def testar_estabilidade_estatico(
     nivel_max,
     N_particulas,
@@ -191,6 +187,8 @@ def testar_estabilidade_estatico(
 
         Não altera o comportamento determinístico.
     """
+    from tests.dados_resultados import salvar_npz
+
 
     os.makedirs(pasta_saida, exist_ok=True)
 
@@ -252,84 +250,18 @@ def testar_estabilidade_estatico(
         # rs tem shape: (Nt, N_particulas, 2)
         rs_cpu = cp.asnumpy(rs)
         r0_array = cp.asnumpy(r0).reshape(-1)
+        salvar_npz(
+            os.path.join(pasta_saida, f"estabilidade_nivel_{n}_dados.npz"),
+            t=ts, rs=rs_cpu, N_fields=n, r0=r0_array, L=L,
+            estocastico=simulador is simular_particulas_ruidosa,
+            estabilidade_temporal=False, temporal=False
+        )
+
 
         t1 = time.perf_counter()
 
-        plt.figure(figsize=(6, 6))
-
-        cores = plt.cm.viridis(
-            np.linspace(0, 1, N_particulas)
-        )
-
-        for i in range(N_particulas):
-
-            # Trajetória
-            plt.plot(
-                rs_cpu[:, i, 0],
-                rs_cpu[:, i, 1],
-                lw=1,
-                alpha=0.4,
-                color=cores[i]
-            )
-
-            # Ponto inicial
-            plt.scatter(
-                rs_cpu[0, i, 0],
-                rs_cpu[0, i, 1],
-                facecolors="none",
-                edgecolors=cores[i],
-                s=30,
-                linewidths=1.5
-            )
-
-            # Ponto final
-            plt.scatter(
-                rs_cpu[-1, i, 0],
-                rs_cpu[-1, i, 1],
-                color=cores[i],
-                s=30,
-                zorder=3
-            )
-
-        # Ponto central
-        plt.scatter(
-            r0_array[0],
-            r0_array[1],
-            c="red",
-            s=100,
-            marker="x",
-            linewidths=2,
-            label="ponto r0"
-        )
-
-        plt.axis("equal")
-        plt.xlabel("x")
-        plt.ylabel("y")
-
-        if simulador is simular_particulas_ruidosa:
-            plt.title(
-                f"Dinâmica estocástica — nível n = {n}"
-            )
-        else:
-            plt.title(
-                f"Estabilidade em torno de r0 — nível n = {n}"
-            )
-
-        plt.legend()
-        plt.grid(alpha=0.3)
-
-        nome_arquivo = os.path.join(
-            pasta_saida,
-            f"estabilidade_nivel_{n}"
-            f"_em_x{r0_array[0]:.3f}"
-            f"_y{r0_array[1]:.2f}.png"
-        )
-
-        plt.savefig(nome_arquivo, dpi=200)
-        plt.close()
 
         print(f"Tempo demorado: {t1 - t0}")
-        print(f"Imagem salva em: {nome_arquivo}")
 
 def testar_estabilidade_temporal(
     nivel_max,
@@ -359,12 +291,14 @@ def testar_estabilidade_temporal(
         matriz de covariância
         sigma² total
 
-    e também salva o histograma 2D da distribuição final.
+    e salva as trajetórias para reconstruir o histograma 2D e os gráficos posteriormente.
 
     A estrutura de `rs` permanece:
 
         rs.shape = (Nt, N_particulas, 2)
     """
+    from tests.dados_resultados import salvar_npz
+
 
     # -------------------------------------------------------------
     # Compatibilidade com o código antigo
@@ -517,6 +451,13 @@ def testar_estabilidade_temporal(
         rs_cpu = cp.asnumpy(rs)
         rs_final_cpu = cp.asnumpy(rs_final)
         r0_array = cp.asnumpy(r0).reshape(-1)
+        salvar_npz(
+            os.path.join(pasta_saida, f"estabilidade_nivel_{n}_dados.npz"),
+            t=ts, rs=rs_cpu, N_fields=n, r0=r0_array, L=L,
+            estocastico=simulador is simular_particulas_ruidosa,
+            estabilidade_temporal=True, temporal=temporal
+        )
+
 
         dic_info = {
             "Media": mean_cpu,
@@ -568,147 +509,16 @@ def testar_estabilidade_temporal(
             f.write("=-=" * 10)
             f.write("\n")
 
-        # ---------------------------------------------------------
-        # Gráfico das trajetórias
-        # ---------------------------------------------------------
 
         t1 = time.perf_counter()
 
-        plt.figure(figsize=(6, 6))
-
-        cores = plt.cm.viridis(
-            np.linspace(0, 1, N_particulas)
-        )
-
-        for i in range(N_particulas):
-
-            plt.plot(
-                rs_cpu[:, i, 0],
-                rs_cpu[:, i, 1],
-                lw=1,
-                alpha=0.4,
-                color=cores[i]
-            )
-
-            plt.scatter(
-                rs_cpu[0, i, 0],
-                rs_cpu[0, i, 1],
-                facecolors="none",
-                edgecolors=cores[i],
-                s=30,
-                linewidths=1.5
-            )
-
-            plt.scatter(
-                rs_cpu[-1, i, 0],
-                rs_cpu[-1, i, 1],
-                color=cores[i],
-                s=30,
-                zorder=3
-            )
-
-        plt.scatter(
-            r0_array[0],
-            r0_array[1],
-            c="red",
-            s=100,
-            marker="x",
-            linewidths=2,
-            label="ponto r0"
-        )
-
-        plt.axis("equal")
-        plt.xlabel("x")
-        plt.ylabel("y")
-
-        if simulador is simular_particulas_ruidosa:
-            plt.title(
-                f"Dinâmica estocástica — nível n = {n}"
-            )
-        else:
-            plt.title(
-                f"Estabilidade em torno de r0 — nível n = {n}"
-            )
-
-        plt.legend()
-        plt.grid(alpha=0.3)
-
-        nome_arquivo = os.path.join(
-            pasta_saida,
-            f"estabilidade_nivel_{n}"
-            f"_em_x{r0_array[0]:.3f}"
-            f"_y{r0_array[1]:.2f}em.png"
-        )
-
-        plt.savefig(
-            nome_arquivo,
-            dpi=200
-        )
-
-        plt.close()
 
         print(
             f"Tempo demorado: "
             f"{t1 - t0}"
         )
 
-        print(
-            f"Imagem salva em: "
-            f"{nome_arquivo}"
-        )
 
-        # ---------------------------------------------------------
-        # Histograma 2D da distribuição final
-        # ---------------------------------------------------------
-
-        plt.figure(figsize=(6, 6))
-
-        x = rs_final_cpu[:, 0]
-        y = rs_final_cpu[:, 1]
-
-        plt.hist2d(
-            x,
-            y,
-            bins=50,
-            density=True
-        )
-
-        plt.colorbar(
-            label="densidade"
-        )
-
-        plt.xlabel("x")
-        plt.ylabel("y")
-
-        if simulador is simular_particulas_ruidosa:
-            plt.title(
-                f"Distribuição final — dinâmica estocástica — n={n}"
-            )
-        else:
-            plt.title(
-                f"Histograma 2D — nível {n}"
-            )
-
-        plt.axis("equal")
-
-        nome_hist = os.path.join(
-            pasta_saida_info,
-            f"hist2d_nivel_{n}"
-            f"_x{r0_array[0]:.3f}"
-            f"_y{r0_array[1]:.2f}.png"
-        )
-
-        plt.savefig(
-            nome_hist,
-            dpi=200
-        )
-
-        plt.close()
-
-        print(
-            f"Histograma salvo em: "
-            f"{nome_hist}"
-        )
 
     return nivel_info
 

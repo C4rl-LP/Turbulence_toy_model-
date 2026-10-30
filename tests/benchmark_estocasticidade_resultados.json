@@ -1,0 +1,291 @@
+{
+  "seed": 812,
+  "dtype": "float64",
+  "repeats": 3,
+  "simulation": [
+    {
+      "particles": 8,
+      "levels": 2,
+      "steps": 4,
+      "dt": 0.006299605249474366,
+      "t_max": 0.025198420997897465,
+      "temporal": false,
+      "original": {
+        "wall_ms": 58.054658002220094,
+        "event_ms": 58.04828643798828
+      },
+      "optimized": {
+        "wall_ms": 2.00491699797567,
+        "event_ms": 1.9990719556808472
+      },
+      "trajectory_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "speedup": 28.956140359344992,
+      "pool_reserved_bytes": 34304
+    },
+    {
+      "particles": 8,
+      "levels": 2,
+      "steps": 4,
+      "dt": 0.006299605249474366,
+      "t_max": 0.025198420997897465,
+      "temporal": true,
+      "original": {
+        "wall_ms": 61.18527099897619,
+        "event_ms": 61.17990493774414
+      },
+      "optimized": {
+        "wall_ms": 2.0005359983770177,
+        "event_ms": 1.9804160594940186
+      },
+      "trajectory_error": {
+        "max_abs": 2.7755575615628914e-17,
+        "allclose": true
+      },
+      "speedup": 30.584438894683323,
+      "pool_reserved_bytes": 34816
+    },
+    {
+      "particles": 32,
+      "levels": 3,
+      "steps": 4,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "temporal": false,
+      "original": {
+        "wall_ms": 374.4382709992351,
+        "event_ms": 374.4309997558594
+      },
+      "optimized": {
+        "wall_ms": 1.9976920011686161,
+        "event_ms": 1.9918080568313599
+      },
+      "trajectory_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "speedup": 187.4354358831066,
+      "pool_reserved_bytes": 89600
+    },
+    {
+      "particles": 32,
+      "levels": 3,
+      "steps": 4,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "temporal": true,
+      "original": {
+        "wall_ms": 379.1196590027539,
+        "event_ms": 379.1114196777344
+      },
+      "optimized": {
+        "wall_ms": 2.002171997446567,
+        "event_ms": 1.99782395362854
+      },
+      "trajectory_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "speedup": 189.3541910916031,
+      "pool_reserved_bytes": 89600
+    },
+    {
+      "particles": 128,
+      "levels": 3,
+      "steps": 4,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "temporal": false,
+      "original": {
+        "wall_ms": 1451.3806369941449,
+        "event_ms": 1451.3724365234375
+      },
+      "optimized": {
+        "wall_ms": 2.0288789964979514,
+        "event_ms": 2.0242879390716553
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "speedup": 715.3608665176057,
+      "pool_reserved_bytes": 326144
+    },
+    {
+      "particles": 128,
+      "levels": 3,
+      "steps": 4,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "temporal": true,
+      "original": {
+        "wall_ms": 1451.7400170007022,
+        "event_ms": 1451.73193359375
+      },
+      "optimized": {
+        "wall_ms": 2.031758995144628,
+        "event_ms": 2.026495933532715
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "speedup": 714.523730654069,
+      "pool_reserved_bytes": 326144
+    },
+    {
+      "particles": 128,
+      "levels": 5,
+      "steps": 4,
+      "dt": 0.001574901312368592,
+      "t_max": 0.006299605249474368,
+      "temporal": false,
+      "original": {
+        "wall_ms": 2856.989412000985,
+        "event_ms": 2856.98046875
+      },
+      "optimized": {
+        "wall_ms": 2.131753004505299,
+        "event_ms": 2.124799966812134
+      },
+      "trajectory_error": {
+        "max_abs": 2.7755575615628914e-17,
+        "allclose": true
+      },
+      "speedup": 1340.2065839536538,
+      "pool_reserved_bytes": 326144
+    },
+    {
+      "particles": 128,
+      "levels": 5,
+      "steps": 4,
+      "dt": 0.001574901312368592,
+      "t_max": 0.006299605249474368,
+      "temporal": true,
+      "original": {
+        "wall_ms": 2845.0062709889608,
+        "event_ms": 2844.99755859375
+      },
+      "optimized": {
+        "wall_ms": 2.0777210011146963,
+        "event_ms": 2.0728321075439453
+      },
+      "trajectory_error": {
+        "max_abs": 2.7755575615628914e-17,
+        "allclose": true
+      },
+      "speedup": 1369.2917718320296,
+      "pool_reserved_bytes": 326144
+    },
+    {
+      "particles": 512,
+      "levels": 3,
+      "steps": 4,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "temporal": false,
+      "original": {
+        "wall_ms": 5776.926114005619,
+        "event_ms": 5776.91943359375
+      },
+      "optimized": {
+        "wall_ms": 1.9595019984990358,
+        "event_ms": 1.9537919759750366
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "speedup": 2948.160358310786,
+      "pool_reserved_bytes": 1277440
+    },
+    {
+      "particles": 512,
+      "levels": 3,
+      "steps": 4,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "temporal": true,
+      "original": {
+        "wall_ms": 5779.691643998376,
+        "event_ms": 5779.68017578125
+      },
+      "optimized": {
+        "wall_ms": 2.052696989267133,
+        "event_ms": 2.0470080375671387
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "speedup": 2815.6574858434797,
+      "pool_reserved_bytes": 1277440
+    }
+  ],
+  "complete_test": [
+    {
+      "particles": 32,
+      "levels": 3,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.0039685026299205,
+      "original_total_ms": 1626.6416360012954,
+      "optimized_total_ms": 1244.7343730018474,
+      "speedup": 1.306818282906759,
+      "samples_ms": {
+        "original": [
+          1675.2913840027759,
+          1626.6416360012954,
+          1620.0714510050602
+        ],
+        "optimized": [
+          1242.4880350008607,
+          1288.8056570081972,
+          1244.7343730018474
+        ]
+      },
+      "trajectory_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "sigma2_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      }
+    },
+    {
+      "particles": 32,
+      "levels": 3,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.0039685026299205,
+      "original_total_ms": 1703.3747139939805,
+      "optimized_total_ms": 1281.926169001963,
+      "speedup": 1.3287619483734654,
+      "samples_ms": {
+        "original": [
+          1656.5265429962892,
+          1703.5191329923691,
+          1703.3747139939805
+        ],
+        "optimized": [
+          1327.5326209986815,
+          1281.926169001963,
+          1280.9288979915436
+        ]
+      },
+      "trajectory_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "sigma2_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      }
+    }
+  ],
+  "artifact_directory": "/tmp/turbulence-estocasticidade-bench-k1e0qs66",
+  "note": "Teste determin\u00edstico: aleatoriedade apenas na nuvem inicial; mesmos valores antes/depois."
+}

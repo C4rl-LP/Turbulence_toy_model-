@@ -1,0 +1,1052 @@
+{
+  "mode": "numpy_vs_cupy_optimized",
+  "seed": 812,
+  "dtype": "float64",
+  "repeats": 3,
+  "numpy": "2.5.2",
+  "cupy": "14.2.0",
+  "device": "NVIDIA RTX A4500",
+  "rows": [
+    {
+      "particles": 1,
+      "levels": 1,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.01,
+      "t_max": 0.04,
+      "gpu_first_field": {
+        "wall_ms": 17.392825000570156,
+        "event_ms": 17.3822078704834
+      },
+      "cpu_field": {
+        "wall_ms": 0.02688099630177021,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.06693800969514996,
+        "event_ms": 0.06239999830722809
+      },
+      "field_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 2.242454997031018,
+        "event_ms": 2.238208055496216
+      },
+      "cpu_rk4": {
+        "wall_ms": 0.3061119932681322,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.5125209902180359,
+        "event_ms": 1.507423996925354
+      },
+      "trajectory_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.560326010803692,
+        "event_ms": 1.5556479692459106
+      },
+      "speedup_field": 0.4015804536793375,
+      "speedup_rk4": 0.20238528605411615,
+      "speedup_total": 0.19618463779275216,
+      "memory": {
+        "pool_used": 2048,
+        "pool_reserved": 7680,
+        "trajectory": 80
+      }
+    },
+    {
+      "particles": 1,
+      "levels": 1,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.01,
+      "t_max": 0.04,
+      "gpu_first_field": {
+        "wall_ms": 0.13563000538852066,
+        "event_ms": 0.13264000415802002
+      },
+      "cpu_field": {
+        "wall_ms": 0.020441992091946304,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.0707019935362041,
+        "event_ms": 0.06656000018119812
+      },
+      "field_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.6518960037501529,
+        "event_ms": 1.6469440460205078
+      },
+      "cpu_rk4": {
+        "wall_ms": 0.3126130031887442,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.5198600012809038,
+        "event_ms": 1.5143040418624878
+      },
+      "trajectory_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.6621239919913933,
+        "event_ms": 1.6577600240707397
+      },
+      "speedup_field": 0.2891289349780307,
+      "speedup_rk4": 0.20568539400029015,
+      "speedup_total": 0.18808043485023165,
+      "memory": {
+        "pool_used": 2048,
+        "pool_reserved": 7680,
+        "trajectory": 80
+      }
+    },
+    {
+      "particles": 1,
+      "levels": 3,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.36706899118144065,
+        "event_ms": 0.3624959886074066
+      },
+      "cpu_field": {
+        "wall_ms": 0.08219499432016164,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.06592299905605614,
+        "event_ms": 0.06143999844789505
+      },
+      "field_error": {
+        "max_abs": 1.1102230246251565e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.746908004861325,
+        "event_ms": 1.7414079904556274
+      },
+      "cpu_rk4": {
+        "wall_ms": 1.0673209908418357,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.5888449997873977,
+        "event_ms": 1.5840959548950195
+      },
+      "trajectory_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.669884004513733,
+        "event_ms": 1.665120005607605
+      },
+      "speedup_field": 1.2468333585713989,
+      "speedup_rk4": 0.6717590394183531,
+      "speedup_total": 0.6391587607024463,
+      "memory": {
+        "pool_used": 2560,
+        "pool_reserved": 8192,
+        "trajectory": 80
+      }
+    },
+    {
+      "particles": 1,
+      "levels": 3,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.11398301285225898,
+        "event_ms": 0.1098560020327568
+      },
+      "cpu_field": {
+        "wall_ms": 0.06725599814672023,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.06034800026100129,
+        "event_ms": 0.05615999922156334
+      },
+      "field_error": {
+        "max_abs": 1.1102230246251565e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.7939850076800212,
+        "event_ms": 1.7896640300750732
+      },
+      "cpu_rk4": {
+        "wall_ms": 1.0608669981593266,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.6010369872674346,
+        "event_ms": 1.5851839780807495
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.6593460022704676,
+        "event_ms": 1.654528021812439
+      },
+      "speedup_field": 1.1144693752210892,
+      "speedup_rk4": 0.662612423445606,
+      "speedup_total": 0.6393283840186147,
+      "memory": {
+        "pool_used": 2560,
+        "pool_reserved": 8192,
+        "trajectory": 80
+      }
+    },
+    {
+      "particles": 8,
+      "levels": 3,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.12800800323020667,
+        "event_ms": 0.12390399724245071
+      },
+      "cpu_field": {
+        "wall_ms": 0.25058699247892946,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.06432099326048046,
+        "event_ms": 0.05939200147986412
+      },
+      "field_error": {
+        "max_abs": 1.1102230246251565e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 2.1523189934669062,
+        "event_ms": 2.1471359729766846
+      },
+      "cpu_rk4": {
+        "wall_ms": 3.9479710103478283,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.6789490036899224,
+        "event_ms": 1.6741440296173096
+      },
+      "trajectory_error": {
+        "max_abs": 2.7755575615628914e-17,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.7397420015186071,
+        "event_ms": 1.7350080013275146
+      },
+      "speedup_field": 3.8958818851588366,
+      "speedup_rk4": 2.3514537973882152,
+      "speedup_total": 2.2692853347804878,
+      "memory": {
+        "pool_used": 3584,
+        "pool_reserved": 11264,
+        "trajectory": 640
+      }
+    },
+    {
+      "particles": 8,
+      "levels": 3,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.1369929959764704,
+        "event_ms": 0.13308799266815186
+      },
+      "cpu_field": {
+        "wall_ms": 0.24625500373076648,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.06686900451313704,
+        "event_ms": 0.062463998794555664
+      },
+      "field_error": {
+        "max_abs": 3.3306690738754696e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.7543970025144517,
+        "event_ms": 1.7501440048217773
+      },
+      "cpu_rk4": {
+        "wall_ms": 3.9825870044296607,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.7128559993579984,
+        "event_ms": 1.643712043762207
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.7997889954131097,
+        "event_ms": 1.7944639921188354
+      },
+      "speedup_field": 3.6826479700679164,
+      "speedup_rk4": 2.3251148992807265,
+      "speedup_total": 2.21280773167275,
+      "memory": {
+        "pool_used": 3584,
+        "pool_reserved": 11264,
+        "trajectory": 640
+      }
+    },
+    {
+      "particles": 32,
+      "levels": 3,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.1082070084521547,
+        "event_ms": 0.10342399775981903
+      },
+      "cpu_field": {
+        "wall_ms": 0.8696300064912066,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.06771499465685338,
+        "event_ms": 0.06332799792289734
+      },
+      "field_error": {
+        "max_abs": 1.1102230246251565e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.7531009943922982,
+        "event_ms": 1.7486079931259155
+      },
+      "cpu_rk4": {
+        "wall_ms": 13.73142100055702,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.6454760043416172,
+        "event_ms": 1.6412800550460815
+      },
+      "trajectory_error": {
+        "max_abs": 0.0,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.7152179934782907,
+        "event_ms": 1.7104640007019043
+      },
+      "speedup_field": 12.842502770591182,
+      "speedup_rk4": 8.344953657377213,
+      "speedup_total": 8.005641879205728,
+      "memory": {
+        "pool_used": 6656,
+        "pool_reserved": 18944,
+        "trajectory": 2560
+      }
+    },
+    {
+      "particles": 32,
+      "levels": 3,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.09935199341271073,
+        "event_ms": 0.09471999853849411
+      },
+      "cpu_field": {
+        "wall_ms": 0.8636929997010157,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.06609299452975392,
+        "event_ms": 0.05734400078654289
+      },
+      "field_error": {
+        "max_abs": 2.220446049250313e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.7411080043530092,
+        "event_ms": 1.7367680072784424
+      },
+      "cpu_rk4": {
+        "wall_ms": 13.831036005285569,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.6721059946576133,
+        "event_ms": 1.667072057723999
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.8024310120381415,
+        "event_ms": 1.7980799674987793
+      },
+      "speedup_field": 13.067844872911547,
+      "speedup_rk4": 8.271626349929846,
+      "speedup_total": 7.673545291281799,
+      "memory": {
+        "pool_used": 6656,
+        "pool_reserved": 18944,
+        "trajectory": 2560
+      }
+    },
+    {
+      "particles": 128,
+      "levels": 3,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.12946200149599463,
+        "event_ms": 0.12492799758911133
+      },
+      "cpu_field": {
+        "wall_ms": 3.3433950011385605,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.09023300663102418,
+        "event_ms": 0.0851840004324913
+      },
+      "field_error": {
+        "max_abs": 2.220446049250313e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.9577119965106249,
+        "event_ms": 1.9543999433517456
+      },
+      "cpu_rk4": {
+        "wall_ms": 53.20420999487396,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.6708800103515387,
+        "event_ms": 1.6660480499267578
+      },
+      "trajectory_error": {
+        "max_abs": 2.7755575615628914e-17,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.766341010807082,
+        "event_ms": 1.7613120079040527
+      },
+      "speedup_field": 37.052904762557525,
+      "speedup_rk4": 31.84202914946613,
+      "speedup_total": 30.121142898994194,
+      "memory": {
+        "pool_used": 23552,
+        "pool_reserved": 62976,
+        "trajectory": 10240
+      }
+    },
+    {
+      "particles": 128,
+      "levels": 3,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.12376799713820219,
+        "event_ms": 0.1196800023317337
+      },
+      "cpu_field": {
+        "wall_ms": 3.3975170081248507,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.08024199632927775,
+        "event_ms": 0.0647680014371872
+      },
+      "field_error": {
+        "max_abs": 3.3306690738754696e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.8866820028051734,
+        "event_ms": 1.8790719509124756
+      },
+      "cpu_rk4": {
+        "wall_ms": 53.43507800716907,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.6687390016159043,
+        "event_ms": 1.6631040573120117
+      },
+      "trajectory_error": {
+        "max_abs": 1.1102230246251565e-16,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.7708829982439056,
+        "event_ms": 1.7658239603042603
+      },
+      "speedup_field": 42.34088337213022,
+      "speedup_rk4": 32.02123157391649,
+      "speedup_total": 30.174256605409795,
+      "memory": {
+        "pool_used": 23552,
+        "pool_reserved": 62976,
+        "trajectory": 10240
+      }
+    },
+    {
+      "particles": 512,
+      "levels": 3,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.15719600196462125,
+        "event_ms": 0.0655359998345375
+      },
+      "cpu_field": {
+        "wall_ms": 13.021894003031775,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.09654200403019786,
+        "event_ms": 0.06838399916887283
+      },
+      "field_error": {
+        "max_abs": 4.440892098500626e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 2.0061450049979612,
+        "event_ms": 2.003135919570923
+      },
+      "cpu_rk4": {
+        "wall_ms": 208.3543560001999,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.691472003585659,
+        "event_ms": 1.6864320039749146
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.769565002177842,
+        "event_ms": 1.7645759582519531
+      },
+      "speedup_field": 134.8831954944564,
+      "speedup_rk4": 123.17931101343736,
+      "speedup_total": 117.74326218238589,
+      "memory": {
+        "pool_used": 91136,
+        "pool_reserved": 251392,
+        "trajectory": 40960
+      }
+    },
+    {
+      "particles": 512,
+      "levels": 3,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.13363499601837248,
+        "event_ms": 0.130048006772995
+      },
+      "cpu_field": {
+        "wall_ms": 13.077351002721116,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.07865599764045328,
+        "event_ms": 0.06547199934720993
+      },
+      "field_error": {
+        "max_abs": 4.440892098500626e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.9334670068928972,
+        "event_ms": 1.9303679466247559
+      },
+      "cpu_rk4": {
+        "wall_ms": 209.25270799489226,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.6770619986345991,
+        "event_ms": 1.6721919775009155
+      },
+      "trajectory_error": {
+        "max_abs": 1.1102230246251565e-16,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.7962989950319752,
+        "event_ms": 1.7913600206375122
+      },
+      "speedup_field": 166.26006147044725,
+      "speedup_rk4": 124.77338832151581,
+      "speedup_total": 116.49102325037343,
+      "memory": {
+        "pool_used": 91136,
+        "pool_reserved": 251392,
+        "trajectory": 40960
+      }
+    },
+    {
+      "particles": 2048,
+      "levels": 3,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.21605100482702255,
+        "event_ms": 0.21190400421619415
+      },
+      "cpu_field": {
+        "wall_ms": 51.648770007886924,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.09836799290496856,
+        "event_ms": 0.09318400174379349
+      },
+      "field_error": {
+        "max_abs": 5.551115123125783e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 2.032841002801433,
+        "event_ms": 2.0306880474090576
+      },
+      "cpu_rk4": {
+        "wall_ms": 829.6205720107537,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.7108459869632497,
+        "event_ms": 1.7049599885940552
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.821607002057135,
+        "event_ms": 1.8165119886398315
+      },
+      "speedup_field": 525.0566620565677,
+      "speedup_rk4": 484.91832598171476,
+      "speedup_total": 455.43334598179837,
+      "memory": {
+        "pool_used": 361472,
+        "pool_reserved": 1005056,
+        "trajectory": 163840
+      }
+    },
+    {
+      "particles": 2048,
+      "levels": 3,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.2266040100948885,
+        "event_ms": 0.22275200486183167
+      },
+      "cpu_field": {
+        "wall_ms": 51.90470100205857,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.0820400018710643,
+        "event_ms": 0.07766400277614594
+      },
+      "field_error": {
+        "max_abs": 5.551115123125783e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.9833460100926459,
+        "event_ms": 1.9797760248184204
+      },
+      "cpu_rk4": {
+        "wall_ms": 827.5960739993025,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.7095229995902628,
+        "event_ms": 1.7049599885940552
+      },
+      "trajectory_error": {
+        "max_abs": 1.1102230246251565e-16,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.8417499959468842,
+        "event_ms": 1.836959958076477
+      },
+      "speedup_field": 632.6755219195757,
+      "speedup_rk4": 484.10935342645877,
+      "speedup_total": 449.3531021151528,
+      "memory": {
+        "pool_used": 361472,
+        "pool_reserved": 1005056,
+        "trajectory": 163840
+      }
+    },
+    {
+      "particles": 8192,
+      "levels": 3,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.26668599457480013,
+        "event_ms": 0.26422399282455444
+      },
+      "cpu_field": {
+        "wall_ms": 206.71873999526724,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.23557899112347513,
+        "event_ms": 0.14336000382900238
+      },
+      "field_error": {
+        "max_abs": 7.771561172376096e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 2.2321750002447516,
+        "event_ms": 2.2277119159698486
+      },
+      "cpu_rk4": {
+        "wall_ms": 3320.2231299947016,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 2.1570279932348058,
+        "event_ms": 2.151423931121826
+      },
+      "trajectory_error": {
+        "max_abs": 1.1102230246251565e-16,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 2.38889800675679,
+        "event_ms": 2.3834240436553955
+      },
+      "speedup_field": 877.4922543365456,
+      "speedup_rk4": 1539.258248111792,
+      "speedup_total": 1389.8555403385744,
+      "memory": {
+        "pool_used": 1442816,
+        "pool_reserved": 4019712,
+        "trajectory": 655360
+      }
+    },
+    {
+      "particles": 8192,
+      "levels": 3,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.0039685026299205,
+      "t_max": 0.015874010519682,
+      "gpu_first_field": {
+        "wall_ms": 0.26808799884747714,
+        "event_ms": 0.26492801308631897
+      },
+      "cpu_field": {
+        "wall_ms": 207.5772279931698,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.09574599971529096,
+        "event_ms": 0.09113600105047226
+      },
+      "field_error": {
+        "max_abs": 4.440892098500626e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.986250004847534,
+        "event_ms": 1.9837440252304077
+      },
+      "cpu_rk4": {
+        "wall_ms": 3305.69918898982,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.6811090026749298,
+        "event_ms": 1.6762880086898804
+      },
+      "trajectory_error": {
+        "max_abs": 1.6653345369377348e-16,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.8671019934117794,
+        "event_ms": 1.8619840145111084
+      },
+      "speedup_field": 2167.9989619453418,
+      "speedup_rk4": 1966.3800406338264,
+      "speedup_total": 1770.497380782757,
+      "memory": {
+        "pool_used": 1442816,
+        "pool_reserved": 4019712,
+        "trajectory": 655360
+      }
+    },
+    {
+      "particles": 128,
+      "levels": 5,
+      "steps": 4,
+      "temporal": false,
+      "dt": 0.001574901312368592,
+      "t_max": 0.006299605249474368,
+      "gpu_first_field": {
+        "wall_ms": 0.4781600000569597,
+        "event_ms": 0.47308799624443054
+      },
+      "cpu_field": {
+        "wall_ms": 6.55639600881841,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.090235989773646,
+        "event_ms": 0.08499199897050858
+      },
+      "field_error": {
+        "max_abs": 5.100087019371813e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.8790939939208329,
+        "event_ms": 1.875648021697998
+      },
+      "cpu_rk4": {
+        "wall_ms": 104.89847000280861,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.7158090049633756,
+        "event_ms": 1.7111040353775024
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.7656490090303123,
+        "event_ms": 1.760543942451477
+      },
+      "speedup_field": 72.65832651988318,
+      "speedup_rk4": 61.13644916151241,
+      "speedup_total": 59.41071496447555,
+      "memory": {
+        "pool_used": 24064,
+        "pool_reserved": 4019712,
+        "trajectory": 10240
+      }
+    },
+    {
+      "particles": 128,
+      "levels": 5,
+      "steps": 4,
+      "temporal": true,
+      "dt": 0.001574901312368592,
+      "t_max": 0.006299605249474368,
+      "gpu_first_field": {
+        "wall_ms": 0.13654799840878695,
+        "event_ms": 0.1326719969511032
+      },
+      "cpu_field": {
+        "wall_ms": 6.58538201241754,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.09296600183006376,
+        "event_ms": 0.08806400001049042
+      },
+      "field_error": {
+        "max_abs": 6.661338147750939e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 1.9136390037601814,
+        "event_ms": 1.9096640348434448
+      },
+      "cpu_rk4": {
+        "wall_ms": 104.56150300160516,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 1.7131779895862564,
+        "event_ms": 1.7080639600753784
+      },
+      "trajectory_error": {
+        "max_abs": 1.6653345369377348e-16,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 1.8433299992466345,
+        "event_ms": 1.8384000062942505
+      },
+      "speedup_field": 70.83645507801036,
+      "speedup_rk4": 61.03364836414776,
+      "speedup_total": 56.72424527585362,
+      "memory": {
+        "pool_used": 24064,
+        "pool_reserved": 4019712,
+        "trajectory": 10240
+      }
+    },
+    {
+      "particles": 128,
+      "levels": 3,
+      "steps": 16,
+      "temporal": false,
+      "dt": 0.0039685026299205,
+      "t_max": 0.063496042078728,
+      "gpu_first_field": {
+        "wall_ms": 0.11957100650761276,
+        "event_ms": 0.028672000393271446
+      },
+      "cpu_field": {
+        "wall_ms": 3.3390300086466596,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.07195999205578119,
+        "event_ms": 0.06758400052785873
+      },
+      "field_error": {
+        "max_abs": 2.220446049250313e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 7.119457994122058,
+        "event_ms": 7.115647792816162
+      },
+      "cpu_rk4": {
+        "wall_ms": 213.52521399967372,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 6.511485989904031,
+        "event_ms": 6.506495952606201
+      },
+      "trajectory_error": {
+        "max_abs": 5.551115123125783e-17,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 6.637847007368691,
+        "event_ms": 6.6327362060546875
+      },
+      "speedup_field": 46.401200351138804,
+      "speedup_rk4": 32.79208683405625,
+      "speedup_total": 32.167842037130235,
+      "memory": {
+        "pool_used": 73216,
+        "pool_reserved": 4019712,
+        "trajectory": 34816
+      }
+    },
+    {
+      "particles": 128,
+      "levels": 3,
+      "steps": 16,
+      "temporal": true,
+      "dt": 0.0039685026299205,
+      "t_max": 0.063496042078728,
+      "gpu_first_field": {
+        "wall_ms": 0.16750700888223946,
+        "event_ms": 0.16470399498939514
+      },
+      "cpu_field": {
+        "wall_ms": 3.3273169974563643,
+        "event_ms": null
+      },
+      "gpu_field": {
+        "wall_ms": 0.0754329957999289,
+        "event_ms": 0.0716480016708374
+      },
+      "field_error": {
+        "max_abs": 3.3306690738754696e-16,
+        "allclose": true
+      },
+      "gpu_first_rk4": {
+        "wall_ms": 6.727515996317379,
+        "event_ms": 6.723775863647461
+      },
+      "cpu_rk4": {
+        "wall_ms": 213.67766099865548,
+        "event_ms": null
+      },
+      "gpu_rk4": {
+        "wall_ms": 6.486582002253272,
+        "event_ms": 6.48089599609375
+      },
+      "trajectory_error": {
+        "max_abs": 2.220446049250313e-16,
+        "allclose": true
+      },
+      "gpu_total": {
+        "wall_ms": 6.64817399228923,
+        "event_ms": 6.643199920654297
+      },
+      "speedup_field": 44.109569852978055,
+      "speedup_rk4": 32.9414876624437,
+      "speedup_total": 32.14080456475505,
+      "memory": {
+        "pool_used": 73216,
+        "pool_reserved": 4019712,
+        "trajectory": 34816
+      }
+    }
+  ],
+  "note": "Nuvem id\u00eantica pr\u00e9-gerada; RK4 e campo do teste, sem gr\u00e1ficos ou arquivos cient\u00edficos. CPU usa algoritmo podado original em NumPy."
+}

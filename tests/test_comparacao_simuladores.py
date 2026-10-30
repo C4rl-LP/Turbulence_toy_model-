@@ -2,9 +2,9 @@ import os
 import sys
 import numpy as np
 import cupy as cp
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 from funcoes_para_centros import lamb
@@ -71,7 +71,7 @@ def executar_teste_comparacao_simuladores(
     rs_estoc_cpu = cp.asnumpy(rs_estoc)
 
     # Salvar dados brutos
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "comparacao_simuladores_dados.npz"),
         ts_det=ts_det, rs_det=rs_det_cpu,
         ts_estoc=ts_estoc, rs_estoc=rs_estoc_cpu,
@@ -79,95 +79,18 @@ def executar_teste_comparacao_simuladores(
         stats_estoc=stats_estoc
     )
 
-    # Gráficos sobrepostos:
 
     # A) Trajetórias comparadas
-    plt.figure(figsize=(7, 7))
-    for i in range(min(50, N_particulas)):
-        plt.plot(rs_det_cpu[:, i, 0], rs_det_cpu[:, i, 1], 'b-', alpha=0.3, lw=0.8, label='Determinístico' if i == 0 else "")
-        plt.plot(rs_estoc_cpu[:, i, 0], rs_estoc_cpu[:, i, 1], 'r-', alpha=0.3, lw=0.8, label='Estocástico' if i == 0 else "")
-    plt.scatter(r0[0], r0[1], c='black', marker='x', s=100, label='r0')
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.title(f'Trajetórias Sobrepostas (N_fields = {N_fields})')
-    plt.legend()
-    plt.axis('equal')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'trajetorias_comparadas.png'), dpi=200)
-    plt.close()
 
     # B) Distribuição final comparada
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharex=True, sharey=True)
-    axes[0].scatter(rs_det_cpu[-1, :, 0], rs_det_cpu[-1, :, 1], color='blue', alpha=0.5, s=15)
-    axes[0].set_title('Distribuição Final - Determinístico')
-    axes[0].set_xlabel('x')
-    axes[0].set_ylabel('y')
-    axes[0].grid(True, alpha=0.3)
-
-    axes[1].scatter(rs_estoc_cpu[-1, :, 0], rs_estoc_cpu[-1, :, 1], color='red', alpha=0.5, s=15)
-    axes[1].set_title('Distribuição Final - Estocástico')
-    axes[1].set_xlabel('x')
-    axes[1].grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'distribuicao_final_comparada.png'), dpi=200)
-    plt.close()
 
     # C) Médias sobrepostas vs t
-    plt.figure(figsize=(8, 5))
-    plt.plot(ts_det, stats_det['mean_x'], 'b--', label='Det <x>')
-    plt.plot(ts_det, stats_det['mean_y'], 'b:', label='Det <y>')
-    plt.plot(ts_estoc, stats_estoc['mean_x'], 'r-', label='Estoc <x>')
-    plt.plot(ts_estoc, stats_estoc['mean_y'], 'r-.', label='Estoc <y>')
-    plt.xlabel('Tempo t')
-    plt.ylabel('Média da Posição')
-    plt.title('Comparação de Médias da Posição')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'medias_comparadas.png'), dpi=200)
-    plt.close()
 
     # D) Variância sobreposta vs t
-    plt.figure(figsize=(8, 5))
-    plt.plot(ts_det, stats_det['var_x'], 'b--', label='Det Var[x]')
-    plt.plot(ts_det, stats_det['var_y'], 'b:', label='Det Var[y]')
-    plt.plot(ts_estoc, stats_estoc['var_x'], 'r-', label='Estoc Var[x]')
-    plt.plot(ts_estoc, stats_estoc['var_y'], 'r-.', label='Estoc Var[y]')
-    plt.xlabel('Tempo t')
-    plt.ylabel('Variância')
-    plt.title('Comparação de Variâncias')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'variancias_comparadas.png'), dpi=200)
-    plt.close()
 
     # E) sigma² total sobreposto vs t
-    plt.figure(figsize=(8, 5))
-    plt.plot(ts_det, stats_det['sigma2'], 'b--', label='Determinístico')
-    plt.plot(ts_estoc, stats_estoc['sigma2'], 'r-', label='Estocástico')
-    plt.xlabel('Tempo t')
-    plt.ylabel(r'$\sigma^2(t)$ Total')
-    plt.title(r'Comparação de $\sigma^2(t)$ Total')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'sigma2_comparado.png'), dpi=200)
-    plt.close()
 
     # F) MSD sobreposto vs t
-    plt.figure(figsize=(8, 5))
-    plt.plot(ts_det, stats_det['msd'], 'b--', label='Determinístico')
-    plt.plot(ts_estoc, stats_estoc['msd'], 'r-', label='Estocástico')
-    plt.xlabel('Tempo t')
-    plt.ylabel('MSD(t)')
-    plt.title('Comparação de MSD(t)')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'msd_comparado.png'), dpi=200)
-    plt.close()
 
     print("\nRESUMO QUANTITATIVO DA COMPARAÇÃO DE SIMULADORES (t_max):")
     print(f"{'Modelo':<18}{'<x>':<12}{'<y>':<12}{'Var[x]':<12}{'sigma2':<12}{'MSD':<12}")

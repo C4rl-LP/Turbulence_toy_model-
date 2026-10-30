@@ -2,9 +2,9 @@ import os
 import sys
 import time
 import numpy as np
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 import funcoes_para_centros as fc
@@ -85,7 +85,7 @@ def executar_teste_convergencia_N(
         dados['sigma2'].append(stats['sigma2'][-1])
 
     # Salvar em .npz
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "convergencia_N_dados.npz"),
         N_fields=np.array(dados['N_fields']),
         dt_N=np.array(dados['dt_N']),
@@ -108,61 +108,8 @@ def executar_teste_convergencia_N(
     ])
     np.savetxt(os.path.join(output_dir, "convergencia_N_resumo.csv"), matrix_data, delimiter=",", header=header, comments="")
 
-    # Gerar gráficos separados
     N_arr = np.array(dados['N_fields'])
 
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['dt_N'], 'o-b')
-    plt.yscale('log')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel('dt_N (escala log)')
-    plt.title('Passo temporal dt_N vs N')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'dt_N_vs_N.png'), dpi=200)
-    plt.close()
-
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['num_passos'], 's-g')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel('Número de passos temporais')
-    plt.title('Número de passos vs N')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'num_passos_vs_N.png'), dpi=200)
-    plt.close()
-
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['sigma2'], '^-r')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel(r'$\sigma^2$ total final')
-    plt.title(r'$\sigma^2$ total final vs N')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'sigma2_vs_N.png'), dpi=200)
-    plt.close()
-
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['var_x'], 'o-', label='Var[x]')
-    plt.plot(N_arr, dados['var_y'], 's-', label='Var[y]')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel('Variância final')
-    plt.title('Variância final em x e y vs N')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'variancia_x_y_vs_N.png'), dpi=200)
-    plt.close()
-
-    plt.figure(figsize=(6, 5))
-    plt.plot(N_arr, dados['tempo_computacional'], 'd-m')
-    plt.xlabel('N (N_fields)')
-    plt.ylabel('Tempo de execução (segundos)')
-    plt.title('Custo computacional vs N')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'custo_computacional_vs_N.png'), dpi=200)
-    plt.close()
 
     print("\nRESUMO QUANTITATIVO DE ESCALA TEMPORAL COM N:")
     print(f"{'N':<5}{'dt_N':<15}{'Passos':<10}{'Tempo(s)':<12}{'sigma2':<12}")

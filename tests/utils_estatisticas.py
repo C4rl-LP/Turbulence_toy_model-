@@ -2,7 +2,6 @@ import os
 import sys
 import numpy as np
 import cupy as cp
-import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor
 
 # Garantir importação dos módulos da raiz do projeto
@@ -147,49 +146,12 @@ def calcular_estatisticas_distribuicao(data: np.ndarray) -> dict:
     }
 
 
-def gerar_histogramas_completos(
-    rs_final: np.ndarray,
-    title_prefix: str,
-    output_dir: str,
-    filename_prefix: str
-):
-    """
-    Gera e salva histogramas 1D de x, 1D de y e 2D de (x, y).
-    """
-    rs_cpu = cp.asnumpy(rs_final) if isinstance(rs_final, cp.ndarray) else np.asarray(rs_final)
-    os.makedirs(output_dir, exist_ok=True)
-    x = rs_cpu[:, 0]
-    y = rs_cpu[:, 1]
+def gerar_histogramas_completos(rs_final, title_prefix, output_dir, filename_prefix):
+    """Compatibilidade: visualização explícita, fora da execução dos testes."""
+    from tests.graficos_resultados import gerar_histogramas_completos as desenhar
+    from tests.dados_resultados import para_numpy
+    return desenhar(para_numpy(rs_final), title_prefix, output_dir, filename_prefix)
 
-    # Histogramas 1D
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-    axes[0].hist(x, bins=30, density=True, color='skyblue', edgecolor='black', alpha=0.7)
-    axes[0].set_xlabel('x')
-    axes[0].set_ylabel('Densidade')
-    axes[0].set_title(f'{title_prefix} - Histograma 1D (x)')
-    axes[0].grid(True, alpha=0.3)
-
-    axes[1].hist(y, bins=30, density=True, color='salmon', edgecolor='black', alpha=0.7)
-    axes[1].set_xlabel('y')
-    axes[1].set_ylabel('Densidade')
-    axes[1].set_title(f'{title_prefix} - Histograma 1D (y)')
-    axes[1].grid(True, alpha=0.3)
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, f'{filename_prefix}_hist1d.png'), dpi=200)
-    plt.close()
-
-    # Histograma 2D
-    plt.figure(figsize=(6, 5))
-    plt.hist2d(x, y, bins=40, density=True, cmap='viridis')
-    plt.colorbar(label='Densidade')
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.title(f'{title_prefix} - Histograma 2D (x, y)')
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, f'{filename_prefix}_hist2d.png'), dpi=200)
-    plt.close()
 
 
 def simular_estocastico_com_perturbacao(

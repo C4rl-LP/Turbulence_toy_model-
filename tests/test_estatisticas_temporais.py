@@ -1,9 +1,9 @@
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 from funcoes_para_centros import lamb
@@ -53,7 +53,7 @@ def executar_teste_estatisticas_temporais(
         stats = calcular_estatisticas_trajetorias(ts, rs)
         series_temporais_n[n] = stats
 
-        np.savez_compressed(
+        salvar_npz(
             os.path.join(output_dir, f"series_temporais_N_{n}.npz"),
             t=ts,
             mean_x=stats['mean_x'],
@@ -64,30 +64,6 @@ def executar_teste_estatisticas_temporais(
             sigma2=stats['sigma2'],
             msd=stats['msd']
         )
-
-    figuras_info = [
-        ('mean_x', 'Média <x>(t)', 'media_x_vs_t.png'),
-        ('mean_y', 'Média <y>(t)', 'media_y_vs_t.png'),
-        ('var_x', 'Variância Var[x](t)', 'variancia_x_vs_t.png'),
-        ('var_y', 'Variância Var[y](t)', 'variancia_y_vs_t.png'),
-        ('cov_xy', 'Covariância Cov[x,y](t)', 'covariancia_vs_t.png'),
-        ('sigma2', r'$\sigma^2(t)$ Total', 'sigma2_vs_t.png'),
-        ('msd', 'MSD(t)', 'msd_vs_t.png')
-    ]
-
-    for chave, titulo, filename in figuras_info:
-        plt.figure(figsize=(7, 5))
-        for n in lista_N_fields:
-            st = series_temporais_n[n]
-            plt.plot(st['t'], st[chave], label=f'N_fields = {n}')
-        plt.xlabel('Tempo t')
-        plt.ylabel(titulo)
-        plt.title(f'{titulo} vs t')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.tight_layout()
-        plt.savefig(os.path.join(output_dir, filename), dpi=200)
-        plt.close()
 
     print("\nRESUMO QUANTITATIVO DAS SÉRIES TEMPORAIS (t_max):")
     print(f"{'N':<5}{'<x>(t_max)':<15}{'Var[x](t_max)':<15}{'sigma2(t_max)':<15}{'MSD(t_max)':<15}")

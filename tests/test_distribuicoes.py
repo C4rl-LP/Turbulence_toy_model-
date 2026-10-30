@@ -1,15 +1,14 @@
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 from funcoes_para_centros import lamb
 from tests.utils_estatisticas import (
-    calcular_estatisticas_distribuicao,
-    gerar_histogramas_completos
+    calcular_estatisticas_distribuicao
 )
 
 
@@ -25,7 +24,7 @@ def executar_teste_distribuicoes(
 ) -> dict:
     """
     9. Análise de distribuições completas:
-       Gera histogramas 1D de x, 1D de y, 2D de (x,y) e calcula assimetria, curtose e quantis.
+       Salva posições finais para histogramas e calcula assimetria, curtose e quantis.
        Compara distribuições entre N_fields, dt, condições iniciais e simuladores (det vs estoc).
     """
     os.makedirs(output_dir, exist_ok=True)
@@ -66,12 +65,6 @@ def executar_teste_distribuicoes(
             'rs_final': rs_final
         }
 
-        gerar_histogramas_completos(
-            rs_final,
-            title_prefix=f'N_fields = {n}',
-            output_dir=output_dir,
-            filename_prefix=f'distribuicao_N_{n}'
-        )
 
     # 2. Comparação entre Simulador Determinístico vs Estocástico
     np.random.seed(seed)
@@ -84,12 +77,6 @@ def executar_teste_distribuicoes(
         t_max=t_max,
         func=func
     )
-    gerar_histogramas_completos(
-        rs_det[-1, :, :],
-        title_prefix='Simulador Determinístico (N=3)',
-        output_dir=output_dir,
-        filename_prefix='distribuicao_deterministic'
-    )
 
     relatorio_estatistico['deterministic'] = {
         'stats_x': calcular_estatisticas_distribuicao(rs_det[-1, :, 0]),
@@ -98,7 +85,7 @@ def executar_teste_distribuicoes(
     }
 
     # Salvar resultados brutos e resumo em tabela .csv
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "distribuicoes_dados.npz"),
         relatorio=relatorio_estatistico
     )

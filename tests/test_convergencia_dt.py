@@ -2,9 +2,9 @@ import os
 import sys
 import numpy as np
 import cupy as cp
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 import funcoes_para_centros as fc
@@ -28,7 +28,7 @@ def executar_teste_convergencia_dt(
        dr = V_N(r,t) dt + dW
 
     Muda o passo dt mantendo fixos N_fields, r0, t_max, N_particulas.
-    Saves: dados brutos .npz, resumo .csv, gráficos em resultados/convergencia_dt/.
+    Salva dados numéricos para reconstrução posterior com tests/plot_resultados.py.
     """
     os.makedirs(output_dir, exist_ok=True)
     if func is None:
@@ -80,19 +80,9 @@ def executar_teste_convergencia_dt(
         resultados['sigma2'].append(stats['sigma2'][-1])
         resultados['distribuicoes_finais'].append(rs_final)
 
-        # Gráfico de Histograma 2D final para este dt
-        plt.figure(figsize=(6, 5))
-        plt.hist2d(rs_final[:, 0], rs_final[:, 1], bins=40, density=True, cmap='viridis')
-        plt.colorbar(label='Densidade')
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.title(f'Distribuição 2D final (dt = {dt:.5e})')
-        plt.tight_layout()
-        plt.savefig(os.path.join(output_dir, f'distribuicao_2d_dt_{idx+1}.png'), dpi=200)
-        plt.close()
 
     # Salvar dados brutos
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "convergencia_dt_dados.npz"),
         dt=np.array(resultados['dt']),
         mean_x=np.array(resultados['mean_x']),
@@ -101,51 +91,11 @@ def executar_teste_convergencia_dt(
         var_y=np.array(resultados['var_y']),
         cov_xy=np.array(resultados['cov_xy']),
         sigma2=np.array(resultados['sigma2']),
-        distribuicoes_finais=np.array(resultados['distribuicoes_finais'], dtype=object)
+        distribuicoes_finais=np.asarray(resultados['distribuicoes_finais'], dtype=float)
     )
 
-    # Gráfico comparativo vs dt
     dts = np.array(resultados['dt'])
 
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-
-    axes[0, 0].plot(dts, resultados['mean_x'], 'o-', label='<x>')
-    axes[0, 0].plot(dts, resultados['mean_y'], 's-', label='<y>')
-    axes[0, 0].set_xlabel('dt')
-    axes[0, 0].set_ylabel('Média Final')
-    axes[0, 0].set_xscale('log')
-    axes[0, 0].grid(True, alpha=0.3)
-    axes[0, 0].legend()
-    axes[0, 0].set_title('Média final vs dt')
-
-    axes[0, 1].plot(dts, resultados['var_x'], 'o-', label='Var[x]')
-    axes[0, 1].plot(dts, resultados['var_y'], 's-', label='Var[y]')
-    axes[0, 1].set_xlabel('dt')
-    axes[0, 1].set_ylabel('Variância Final')
-    axes[0, 1].set_xscale('log')
-    axes[0, 1].grid(True, alpha=0.3)
-    axes[0, 1].legend()
-    axes[0, 1].set_title('Variância final vs dt')
-
-    axes[1, 0].plot(dts, resultados['cov_xy'], 'd-r', label='Cov[x,y]')
-    axes[1, 0].set_xlabel('dt')
-    axes[1, 0].set_ylabel('Covariância')
-    axes[1, 0].set_xscale('log')
-    axes[1, 0].grid(True, alpha=0.3)
-    axes[1, 0].legend()
-    axes[1, 0].set_title('Covariância vs dt')
-
-    axes[1, 1].plot(dts, resultados['sigma2'], '^-g', label=r'$\sigma^2$ total')
-    axes[1, 1].set_xlabel('dt')
-    axes[1, 1].set_ylabel(r'$\sigma^2$')
-    axes[1, 1].set_xscale('log')
-    axes[1, 1].grid(True, alpha=0.3)
-    axes[1, 1].legend()
-    axes[1, 1].set_title(r'$\sigma^2$ total vs dt')
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'estatisticas_vs_dt.png'), dpi=200)
-    plt.close()
 
     # Resumo quantitativo
     print("\nRESUMO QUANTITATIVO DE CONVERGÊNCIA TEMPORAL (dt):")

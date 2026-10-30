@@ -3,9 +3,9 @@ import sys
 import time
 import numpy as np
 import cupy as cp
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 import funcoes_para_centros as fc
@@ -17,8 +17,7 @@ from funcoes_para_centros import (
     c_padrao
 )
 from tests.utils_estatisticas import (
-    calcular_estatisticas_trajetorias,
-    gerar_histogramas_completos
+    calcular_estatisticas_trajetorias
 )
 
 
@@ -52,7 +51,7 @@ def executar_teste_estocasticidade_parametros(
     dt_ref: float = None,
     temporal: bool = False,
     num_amostras: int = 1,
-    delta_r0: float = .1, 
+    delta_r0: float = .1,
     output_dir: str =None,
     seed: int = 42
 ) -> dict:
@@ -75,13 +74,13 @@ def executar_teste_estocasticidade_parametros(
     t_max : float
         Tempo máximo de integração temporal.
     dt_ref : float ou None
-        Passo temporal de integração. Se None, adota 0.03 * fc.T(N_fields).
+        Passo temporal de integração. Se None, adota 0.01 * fc.T(N_fields).
     temporal : bool
         Se True, campo depende explicitamente de t; se False, campo com centros em t=0.
     num_amostras : int
         Número de repetições com sementes diferentes para avaliar robustez estatística.
     output_dir : str
-        Diretório onde os resultados, dados e figuras serão salvos.
+        Diretório dos dados numéricos e metadados; imagens são geradas separadamente.
     seed : int
         Semente inicial para reprodutibilidade.
     """
@@ -125,7 +124,7 @@ def executar_teste_estocasticidade_parametros(
         f.write(f"R_1 = {R_1}, T_1 = {T_1}, lambda = {lamb}\n")
         f.write(f"alpha_padrao = {alpha_padrao:.4f}, c_padrao = {c_padrao:.4f}\n")
         f.write(f"r_0 = {r0.tolist()}, ||r_0|| = {norm_r0:.6e}\n")
-        f.write(f"delta_r = ||\delta r0|| * R(N) = {dimensao_quadrado:.6e}\n")
+        f.write(f"delta_r = ||\\delta r0|| * R(N) = {dimensao_quadrado:.6e}\n")
         f.write(f"Tamanho do quadrado/diâmetro L = {dimensao_quadrado:.6e}\n")
         f.write(f"Número de partículas: {N_particulas}\n")
         f.write(f"Tempo de integração t_max: {t_max}, dt = {dt:.6e}\n")
@@ -154,7 +153,6 @@ def executar_teste_estocasticidade_parametros(
     matriz_disp_media_final = np.zeros((n_c, n_alpha))
     matriz_norm_sigma2 = np.zeros((n_c, n_alpha))
 
-    historico_temporal = {}
     dados_pontos = {}
 
     t_inicio_total = time.perf_counter()
@@ -249,7 +247,7 @@ def executar_teste_estocasticidade_parametros(
                 f.write("=-=" * 10 + "\n")
 
             # Salvar dados do ponto
-            np.savez_compressed(
+            salvar_npz(
                 os.path.join(pasta_ponto, "dados_ponto.npz"),
                 alpha_cut=alpha_val,
                 c=c_val,
@@ -270,55 +268,6 @@ def executar_teste_estocasticidade_parametros(
                 norm_sigma2=norm_sigma2
             )
 
-            # Trajetórias representativas
-            plt.figure(figsize=(6, 6))
-            cores = plt.cm.viridis(np.linspace(0, 1, N_particulas))
-            for p_i in range(N_particulas):
-                plt.plot(rs_ref[:, p_i, 0], rs_ref[:, p_i, 1], lw=0.8, alpha=0.35, color=cores[p_i])
-                plt.scatter(rs_ref[0, p_i, 0], rs_ref[0, p_i, 1], facecolors="none", edgecolors=cores[p_i], s=25, linewidths=1.0)
-                plt.scatter(rs_ref[-1, p_i, 0], rs_ref[-1, p_i, 1], color=cores[p_i], s=25, zorder=3)
-            plt.scatter(r0[0], r0[1], c="red", s=100, marker="x", linewidths=2, label=r"$r_0$")
-            plt.axis("equal")
-            plt.xlabel("x")
-            plt.ylabel("y")
-            plt.title(f"Trajetórias (alpha={alpha_val:.3f}, c={c_val:.2f})")
-            plt.legend()
-            plt.grid(alpha=0.3)
-            plt.tight_layout()
-            plt.savefig(os.path.join(pasta_ponto, "trajetorias.png"), dpi=200)
-            plt.close()
-
-            # Distribuição inicial vs final
-            plt.figure(figsize=(6, 6))
-            plt.scatter(rs_ref[0, :, 0], rs_ref[0, :, 1], s=12, alpha=0.5, label=rf"Inicial ($\delta r = {delta_r:.2e}$)")
-            plt.scatter(rs_ref[-1, :, 0], rs_ref[-1, :, 1], s=12, alpha=0.6, label="Final")
-            plt.scatter(r0[0], r0[1], c="red", marker="x", s=100, linewidths=2, label=r"$r_0$")
-            plt.scatter(mean_final_ref[0], mean_final_ref[1], c="black", marker="+", s=100, linewidths=2, label=r"$\bar{r}_{final}$")
-            plt.axis("equal")
-            plt.xlabel("x")
-            plt.ylabel("y")
-            plt.title(f"Distribuição inicial vs final (alpha={alpha_val:.3f}, c={c_val:.2f})")
-            plt.grid(alpha=0.3)
-            plt.legend()
-            plt.tight_layout()
-            plt.savefig(os.path.join(pasta_ponto, "distribuicao_inicial_final.png"), dpi=200)
-            plt.close()
-
-            # Histogramas da distribuição final
-            gerar_histogramas_completos(
-                rs_final=rs_ref[-1, :, :],
-                title_prefix=f"(alpha={alpha_val:.2f}, c={c_val:.2f})",
-                output_dir=pasta_ponto,
-                filename_prefix="distribuicao_final"
-            )
-
-            # Salva série temporal de sigma²(t) para análise posterior
-            historico_temporal[chave] = {
-                "t": ts_ref,
-                "sigma2": stats_ref["sigma2"],
-                "alpha": alpha_val,
-                "c": c_val
-            }
 
             dados_pontos[chave] = {
                 "alpha": alpha_val,
@@ -333,93 +282,19 @@ def executar_teste_estocasticidade_parametros(
     print("-" * 75)
     print(f"Varredura concluída em {t_fim_total - t_inicio_total:.2f} s.")
 
-    # =================================================================
-    # VISUALIZAÇÕES GLOBAIS: MAPAS DE CALOR E TRANSIÇÕES
-    # =================================================================
 
     # 1. Mapa de Calor de sigma² final no plano (alpha_cut, c)
-    plt.figure(figsize=(8, 6))
-    im = plt.imshow(
-        matriz_sigma2_final,
-        origin="lower",
-        aspect="auto",
-        cmap="viridis",
-        extent=[min(lista_alpha), max(lista_alpha), min(lista_c), max(lista_c)]
-    )
-    cbar = plt.colorbar(im)
-    cbar.set_label(r"$\sigma^2(t_{\max})$ final")
-    plt.xlabel(r"$\alpha_{\mathrm{cut}}$ (raio de corte $R_{\mathrm{cutoff}} = \alpha R_n$)")
-    plt.ylabel(r"$c$ (inclinação da função bump)")
-    plt.title(rf"Dispersão final $\sigma^2(t_{{\max}})$ no plano $(\alpha, c)$ (N={N_fields})")
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "mapa_calor_sigma2_final.png"), dpi=200)
-    plt.close()
 
     # 2. Mapa de Calor da Dispersão Normalizada sigma² / delta_r² (escala log)
-    plt.figure(figsize=(8, 6))
-    log_norm = np.log10(np.maximum(matriz_norm_sigma2, 1e-12))
-    im = plt.imshow(
-        log_norm,
-        origin="lower",
-        aspect="auto",
-        cmap="plasma",
-        extent=[min(lista_alpha), max(lista_alpha), min(lista_c), max(lista_c)]
-    )
-    cbar = plt.colorbar(im)
-    cbar.set_label(r"$\log_{10}(\sigma^2 / \delta r^2)$")
-    plt.xlabel(r"$\alpha_{\mathrm{cut}}$")
-    plt.ylabel(r"$c$")
-    plt.title(rf"Razão de dispersão $\log_{10}(\sigma^2 / \delta r^2)$ (N={N_fields})")
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "mapa_calor_sigma2_normalizado.png"), dpi=200)
-    plt.close()
 
     # 3. Evolução temporal de sigma²(t) para curvas representativas
-    plt.figure(figsize=(9, 6))
-    for c_sel in [lista_c[0], lista_c[len(lista_c)//2], lista_c[-1]]:
-        for a_sel in [lista_alpha[0], lista_alpha[len(lista_alpha)//2], lista_alpha[-1]]:
-            chave = f"alpha_{a_sel:.4f}_c_{c_sel:.4f}"
-            if chave in historico_temporal:
-                d = historico_temporal[chave]
-                plt.plot(d["t"], d["sigma2"], lw=1.5, label=rf"$\alpha$={a_sel:.2f}, $c$={c_sel:.2f}")
-
-    plt.xlabel("Tempo")
-    plt.ylabel(r"$\sigma^2(t)$")
-    plt.title(rf"Evolução temporal de $\sigma^2(t)$ para parâmetros selecionados (N={N_fields})")
-    plt.grid(alpha=0.3)
-    plt.legend(bbox_to_anchor=(1.02, 1), loc="upper left", fontsize=9)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "evolucao_temporal_sigma2_selecionados.png"), dpi=200)
-    plt.close()
 
     # 4. Cortes unidimensionais: sigma² vs c para diferentes alpha
-    plt.figure(figsize=(8, 5))
-    for idx_a, alpha_val in enumerate(lista_alpha):
-        plt.plot(lista_c, matriz_sigma2_final[:, idx_a], "o-", lw=1.5, label=rf"$\alpha$={alpha_val:.2f}")
-    plt.xlabel(r"$c$")
-    plt.ylabel(r"$\sigma^2(t_{\max})$ final")
-    plt.title(r"Cortes unidimensionais: $\sigma^2$ final vs $c$")
-    plt.grid(alpha=0.3)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "corte_sigma2_vs_c.png"), dpi=200)
-    plt.close()
 
     # 5. Cortes unidimensionais: sigma² vs alpha para diferentes c
-    plt.figure(figsize=(8, 5))
-    for idx_c, c_val in enumerate(lista_c):
-        plt.plot(lista_alpha, matriz_sigma2_final[idx_c, :], "s-", lw=1.5, label=rf"$c$={c_val:.2f}")
-    plt.xlabel(r"$\alpha_{\mathrm{cut}}$")
-    plt.ylabel(r"$\sigma^2(t_{\max})$ final")
-    plt.title(r"Cortes unidimensionais: $\sigma^2$ final vs $\alpha_{\mathrm{cut}}$")
-    plt.grid(alpha=0.3)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "corte_sigma2_vs_alpha.png"), dpi=200)
-    plt.close()
 
     # Salva o resumo global numérico da varredura
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "resumo_varredura.npz"),
         N_fields=N_fields,
         r0=r0,

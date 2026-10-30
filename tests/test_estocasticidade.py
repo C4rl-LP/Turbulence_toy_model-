@@ -3,9 +3,9 @@ import sys
 import time
 import numpy as np
 import cupy as cp
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 import funcoes_para_centros as fc
@@ -17,8 +17,7 @@ from funcoes_para_centros import (
     c_padrao
 )
 from tests.utils_estatisticas import (
-    calcular_estatisticas_trajetorias,
-    gerar_histogramas_completos
+    calcular_estatisticas_trajetorias
 )
 
 
@@ -48,7 +47,7 @@ def executar_teste_estocasticidade(
             * Covariância cov_xy(t)
             * Dispersão quadrática média sigma²(t) = (1/N) * sum_i ||r_i(t) - r_medio(t)||²
       - Gera arquivos de dados numéricos (.npz), estatísticas formatadas (Informações.txt)
-        e gráficos seguindo as convenções dos testes de estabilidade existentes em integradores.py.
+        para visualização posterior com tests/plot_resultados.py.
     """
     if output_dir is None:
         if temporal:
@@ -100,7 +99,7 @@ def executar_teste_estocasticidade(
         os.makedirs(sub_dir, exist_ok=True)
 
         R_n = float(fc.R(n))
-        
+
         dimensao_quadrado = delta_r0 * R_n
 
         if dt_ref is None:
@@ -160,7 +159,7 @@ def executar_teste_estocasticidade(
         # -------------------------------------------------------------
         # 4. Salvar dados numéricos completos
         # -------------------------------------------------------------
-        np.savez_compressed(
+        salvar_npz(
             os.path.join(sub_dir, f"estocasticidade_nivel_{n}_dados.npz"),
             N_fields=n,
             R_n=R_n,
@@ -182,121 +181,6 @@ def executar_teste_estocasticidade(
             dispersao_media_final=dispersao_media_final
         )
 
-        # -------------------------------------------------------------
-        # 5. Gráfico de trajetórias no estilo de estabilidade_nivel_n
-        # -------------------------------------------------------------
-        plt.figure(figsize=(6, 6))
-        cores = plt.cm.viridis(np.linspace(0, 1, N_particulas))
-
-        for i in range(N_particulas):
-            plt.plot(
-                rs[:, i, 0],
-                rs[:, i, 1],
-                lw=1,
-                alpha=0.4,
-                color=cores[i]
-            )
-            plt.scatter(
-                rs[0, i, 0],
-                rs[0, i, 1],
-                facecolors="none",
-                edgecolors=cores[i],
-                s=30,
-                linewidths=1.2
-            )
-            plt.scatter(
-                rs[-1, i, 0],
-                rs[-1, i, 1],
-                color=cores[i],
-                s=30,
-                zorder=3
-            )
-
-        plt.scatter(
-            r0[0],
-            r0[1],
-            c="red",
-            s=100,
-            marker="x",
-            linewidths=2,
-            label=r"ponto $r_0$"
-        )
-        plt.axis("equal")
-        plt.xlabel("x")
-        plt.ylabel("y")
-        plt.title(f"Estabilidade / Estocasticidade em torno de r0 — nível n = {n}")
-        plt.legend()
-        plt.grid(alpha=0.3)
-        plt.tight_layout()
-        plt.savefig(
-            os.path.join(sub_dir, f"trajetorias_nivel_{n}_em_x{r0[0]:.3f}_y{r0[1]:.2f}.png"),
-            dpi=200
-        )
-        plt.close()
-
-        # -------------------------------------------------------------
-        # 6. Histograma 2D da distribuição final no estilo de integradores.py
-        # -------------------------------------------------------------
-        plt.figure(figsize=(6, 6))
-        plt.hist2d(
-            rs_final[:, 0],
-            rs_final[:, 1],
-            bins=50,
-            density=True,
-            cmap="viridis"
-        )
-        plt.colorbar(label="densidade")
-        plt.xlabel("x")
-        plt.ylabel("y")
-        plt.axis("equal")
-        plt.title(f"Histograma 2D — nível {n}")
-        plt.tight_layout()
-        nome_hist = os.path.join(
-            pasta_info,
-            f"hist2d_nivel_{n}_x{r0[0]:.3f}_y{r0[1]:.2f}.png"
-        )
-        plt.savefig(nome_hist, dpi=200)
-        plt.close()
-
-        # Histogramas 1D e 2D detalhados na pasta do nível
-        gerar_histogramas_completos(
-            rs_final=rs_final,
-            title_prefix=f"Distribuição final (n={n})",
-            output_dir=sub_dir,
-            filename_prefix="distribuicao_final"
-        )
-
-        # -------------------------------------------------------------
-        # 7. Gráfico temporal de sigma²(t)
-        # -------------------------------------------------------------
-        plt.figure(figsize=(7, 5))
-        plt.plot(ts, stats["sigma2"], "b-", lw=1.5, label=r"$\sigma^2(t)$")
-        plt.xlabel("Tempo")
-        plt.ylabel(r"$\sigma^2(t)$")
-        plt.title(f"Evolução temporal da dispersão quadrática (n={n})")
-        plt.grid(alpha=0.3)
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig(os.path.join(sub_dir, "sigma2_vs_tempo.png"), dpi=200)
-        plt.close()
-
-        # -------------------------------------------------------------
-        # 8. Gráfico de dispersão inicial vs final
-        # -------------------------------------------------------------
-        plt.figure(figsize=(6, 6))
-        plt.scatter(rs[0, :, 0], rs[0, :, 1], s=12, alpha=0.5, label=rf"Inicial ($\delta r_n = {dimensao_quadrado:.2e}$)")
-        plt.scatter(rs_final[:, 0], rs_final[:, 1], s=12, alpha=0.6, label="Final")
-        plt.scatter(r0[0], r0[1], c="red", marker="x", s=100, linewidths=2, label=r"$r_0$")
-        plt.scatter(mean_final[0], mean_final[1], c="black", marker="+", s=100, linewidths=2, label=r"$\bar{r}_{final}$")
-        plt.axis("equal")
-        plt.xlabel("x")
-        plt.ylabel("y")
-        plt.title(f"Distribuição inicial e final (n={n})")
-        plt.grid(alpha=0.3)
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig(os.path.join(sub_dir, "distribuicao_inicial_final.png"), dpi=200)
-        plt.close()
 
         print(f"  Tempo decorrido: {t1_n - t0_n:.2f} s")
         print(f"  sigma² final: {sigma2_final:.6e}")
@@ -323,51 +207,15 @@ def executar_teste_estocasticidade(
             "tempo_execucao": t1_n - t0_n
         }
 
-    # =================================================================
-    # Comparação global entre os níveis n
-    # =================================================================
+
     niveis = np.array(list(lista_N_fields))
     deltas = np.array([resultados_globais[f"N_{n}"]["delta_r_n"] for n in niveis])
     sigma2_finais = np.array([resultados_globais[f"N_{n}"]["sigma2_final"] for n in niveis])
     dispersoes_finais = np.array([resultados_globais[f"N_{n}"]["dispersao_media_final"] for n in niveis])
 
-    # Gráfico sigma2 final vs n
-    plt.figure(figsize=(7, 5))
-    plt.plot(niveis, sigma2_finais, "o-", color="darkblue", lw=1.8, markersize=6)
-    plt.xlabel(r"Nível $n$")
-    plt.ylabel(r"$\sigma^2(t_{\max})$ final")
-    plt.title(r"Dispersão quadrática final $\sigma^2(t_{\max})$ vs Nível $n$")
-    plt.grid(alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "sigma2_vs_nivel.png"), dpi=200)
-    plt.close()
-
-    # Gráfico sigma2 final vs delta_r_n (escala log-log)
-    plt.figure(figsize=(7, 5))
-    plt.plot(deltas, sigma2_finais, "s-", color="crimson", lw=1.8, markersize=6)
-    plt.xscale("log")
-    plt.yscale("log")
-    plt.xlabel(r"Tamanho inicial $\delta r_n = \|r_0\| R(n)$")
-    plt.ylabel(r"$\sigma^2(t_{\max})$ final")
-    plt.title(r"$\sigma^2(t_{\max})$ vs $\delta r_n$ inicial (escala log-log)")
-    plt.grid(True, which="both", alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "sigma2_vs_delta_r.png"), dpi=200)
-    plt.close()
-
-    # Gráfico dispersão média final vs n
-    plt.figure(figsize=(7, 5))
-    plt.plot(niveis, dispersoes_finais, "^-", color="teal", lw=1.8, markersize=6)
-    plt.xlabel(r"Nível $n$")
-    plt.ylabel("Dispersão média final")
-    plt.title(r"Dispersão média final vs Nível $n$")
-    plt.grid(alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "dispersao_media_vs_nivel.png"), dpi=200)
-    plt.close()
 
     # Resumo global compactado
-    np.savez_compressed(
+    salvar_npz(
         os.path.join(output_dir, "resumo_global.npz"),
         niveis=niveis,
         delta_r_n=deltas,
@@ -383,7 +231,7 @@ def executar_teste_estocasticidade(
     for i, n in enumerate(niveis):
         print(f"{n:<12}{deltas[i]:<18.6e}{sigma2_finais[i]:<20.6e}{dispersoes_finais[i]:<20.6e}")
     print("=" * 75)
-    print(f"Resultados, estatísticas e gráficos salvos em: {output_dir}\n")
+    print(f"Dados e estatísticas salvos em: {output_dir}\n")
 
     return resultados_globais
 

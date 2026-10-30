@@ -1,9 +1,9 @@
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tests.dados_resultados import salvar_npz
 import integradores as it
 import campos
 from funcoes_para_centros import lamb
@@ -37,9 +37,6 @@ def executar_teste_difusao(
     print("EXECUTANDO TESTE DE DIFUSÃO E EXPOENTE ANÔMALO alpha(t)")
     print("=" * 60)
 
-    plt.figure(figsize=(7, 5))
-    fig_alpha, ax_alpha = plt.subplots(figsize=(7, 5))
-
     for n_idx, n in enumerate(lista_N_fields):
         np.random.seed(seed + n_idx)
 
@@ -65,45 +62,12 @@ def executar_teste_difusao(
         }
 
         # Salvar dados numéricos brutos por nível N
-        np.savez_compressed(
+        salvar_npz(
             os.path.join(output_dir, f"difusao_N_{n}_dados.npz"),
             t=ts,
             msd=msd,
             alpha_t=alpha_t
         )
-
-        # Plot log-log de MSD(t) vs t
-        valid = (ts > 0) & (msd > 0)
-        plt.figure(1)
-        plt.loglog(ts[valid], msd[valid], label=f'N_fields = {n}')
-
-        # Plot de alpha(t) vs t
-        ax_alpha.plot(ts[valid], alpha_t[valid], label=f'N_fields = {n}')
-
-    # Finalizar gráfico 1: Log-Log de MSD(t)
-    plt.figure(1)
-    # Linha de referência difusiva MSD ~ t
-    t_ref = np.linspace(t_max / 10, t_max, 50)
-    plt.loglog(t_ref, t_ref * (msd[-1] / t_max), 'k--', label='Referência difusiva (MSD ~ t)')
-    plt.xlabel('Tempo t (escala log)')
-    plt.ylabel('MSD(t) (escala log)')
-    plt.title('Gráfico Log-Log do Deslocamento Quadrático Médio MSD(t)')
-    plt.legend()
-    plt.grid(True, which="both", ls="--", alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'msd_loglog.png'), dpi=200)
-    plt.close(1)
-
-    # Finalizar gráfico 2: Expoente local alpha(t)
-    ax_alpha.axhline(1.0, color='black', linestyle='--', label='Difusão normal (alpha=1)')
-    ax_alpha.set_xlabel('Tempo t')
-    ax_alpha.set_ylabel(r'Expoente local $\alpha(t) = d \log(MSD) / d \log(t)$')
-    ax_alpha.set_title(r'Evolução Temporal do Expoente Difusivo Local $\alpha(t)$')
-    ax_alpha.legend()
-    ax_alpha.grid(True, alpha=0.3)
-    fig_alpha.tight_layout()
-    fig_alpha.savefig(os.path.join(output_dir, 'expoente_difusao_alpha.png'), dpi=200)
-    plt.close(fig_alpha)
 
     print("\nRESUMO QUANTITATIVO DO EXPOENTE DIFUSIVO alpha(t):")
     print(f"{'N':<5}{'MSD(t_max)':<15}{'alpha_medio (t > t_max/2)':<25}")
