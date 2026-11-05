@@ -19,7 +19,8 @@ def executar_teste_estatisticas_temporais(
     func=None,
     temporal: bool = False,
     output_dir: str = os.path.join("resultados", "estatisticas_temporais"),
-    seed: int = 42
+    seed: int = 42,
+    backend_name: str = "auto"
 ) -> dict:
     """
     5. Estatísticas ao longo do tempo para cada instante t_k:
@@ -28,7 +29,7 @@ def executar_teste_estatisticas_temporais(
     """
     os.makedirs(output_dir, exist_ok=True)
     if func is None:
-        func = campos.campo_total_podado
+        func = campos.campo_total
 
     series_temporais_n = {}
 
@@ -47,7 +48,8 @@ def executar_teste_estatisticas_temporais(
             t_max=t_max,
             lamb=lamb,
             func=func,
-            temporal=temporal
+            temporal=temporal,
+            backend_name=backend_name
         )
 
         stats = calcular_estatisticas_trajetorias(ts, rs)

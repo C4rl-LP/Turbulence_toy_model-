@@ -101,10 +101,11 @@ def salvar_por_nivel(
 
         print(f"salvo: {nome}")
 
-salvar_por_nivel(
-    Nmax=20,
-    t=0,
-    func=campos.campo_total_podado,
-    N_min= 9
-)
+if __name__ == "__main__":
+    salvar_por_nivel(
+        Nmax=20,
+        t=0,
+        func=campos.campo_total_podado,
+        N_min=9,
+    )
 
