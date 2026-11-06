@@ -3,7 +3,53 @@ import argparse
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import numpy as np
+
+
+def plotar_distribuicoes_finais(raiz, destino, nivel, alphas, valores_c):
+    """Salva histogramas 2D das posições finais de cada ponto/amostra."""
+    ausentes = 0
+    for c_val in valores_c:
+        for alpha in alphas:
+            ponto = raiz / f"alpha_{alpha:.3f}_c_{c_val:.3f}" / "dados_ponto.npz"
+            if not ponto.exists():
+                ausentes += 1
+                continue
+            with np.load(ponto) as dados:
+                if "rs_final" not in dados:
+                    ausentes += 1
+                    continue
+                posicoes = dados["rs_final"]
+                seeds = dados["seeds_amostras"] if "seeds_amostras" in dados else None
+                tempo_final = float(dados["t"][-1])
+            if posicoes.ndim != 3 or posicoes.shape[2] != 2:
+                raise ValueError(f"{ponto}: rs_final deve ter forma (amostras, partículas, 2).")
+            if seeds is not None and seeds.shape != (posicoes.shape[0],):
+                raise ValueError(f"{ponto}: seeds_amostras incompatível com rs_final.")
+            for idx, amostra in enumerate(posicoes):
+                fig, ax = plt.subplots(figsize=(7, 6))
+                _, _, _, imagem = ax.hist2d(
+                    amostra[:, 0], amostra[:, 1], bins=60, cmap="inferno",
+                    norm=LogNorm(vmin=1), cmin=1,
+                )
+                fig.colorbar(imagem, ax=ax, label="Número de partículas por célula (escala log)")
+                semente = f", seed={int(seeds[idx])}" if seeds is not None else ""
+                ax.set(
+                    xlabel="x", ylabel="y",
+                    title=(f"Distribuição final (N={nivel}, α={alpha:.5g}, c={c_val:.3g})\n"
+                           f"Amostra {idx + 1}{semente}, t={tempo_final:.6g}, "
+                           f"{len(amostra)} partículas"),
+                )
+                ax.set_aspect("equal", adjustable="box")
+                fig.tight_layout()
+                nome = (f"distribuicao_final_alpha_{alpha:.3f}_c_{c_val:.3f}"
+                        f"_amostra_{idx + 1}.png")
+                fig.savefig(destino / nome, dpi=200)
+                plt.close(fig)
+    if ausentes:
+        print(f"N={nivel}: {ausentes} ponto(s) sem posições finais salvas; "
+              "distribuições desses pontos não foram geradas.")
 
 
 def plotar(arquivo_resumo, pasta_saida=None):
@@ -82,6 +128,8 @@ def plotar(arquivo_resumo, pasta_saida=None):
     fig.tight_layout()
     fig.savefig(destino / "evolucao_temporal_sigma2_selecionados.png", dpi=200)
     plt.close(fig)
+
+    plotar_distribuicoes_finais(raiz, destino, nivel, alphas, valores_c)
 
 
 def main():

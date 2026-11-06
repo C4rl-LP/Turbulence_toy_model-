@@ -208,7 +208,7 @@ def get_cuda_field_kernel() -> Any:
     _RAW_KERNEL_CACHE = cp.RawKernel(
         CUDA_SRC_FIELD_PRUNED,
         "campo_vortices_podado_kernel",
-        options=("-O3", "--use_fast_math"),
+        options=("--use_fast_math",),
     )
     return _RAW_KERNEL_CACHE
 
@@ -311,7 +311,7 @@ def medir_tempo_compilacao_kernel() -> dict[str, float]:
     k1 = cp.RawKernel(
         CUDA_SRC_FIELD_PRUNED,
         "campo_vortices_podado_kernel",
-        options=("-O3", "--use_fast_math"),
+        options=("--use_fast_math",),
     )
     # Força geração de código PTX/binário
     _ = k1.attributes

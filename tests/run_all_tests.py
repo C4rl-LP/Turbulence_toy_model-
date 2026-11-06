@@ -9,7 +9,7 @@ import backend
 import campos
 from tests.benchmark_rk4_cpu_gpu import executar as executar_benchmark
 from tests.test_estocasticidade import executar_teste_estocasticidade
-
+from tests.test_estocasticidade_parametros import executar_teste_estocasticidade_parametros
 
 def main():
     if not backend.is_cuda_available():
@@ -25,37 +25,9 @@ def main():
             "Os resultados anteriores foram preservados; escolha ou arquive "
             "esse diretório antes de executar novamente."
         )
-
-    print("\n=== 1/2: Benchmark RK4 CPU/GPU ===")
-    for n_particulas in (100, 1000, 10000, 100000):
-        for n_niveis in (3, 5):
-            resultado = executar_benchmark(
-                n_particulas=n_particulas,
-                n_niveis=n_niveis,
-                dt=0.01,
-                t_max=0.1,
-                repeticoes=3,
-                alpha=campos.alpha_padrao,
-                c=campos.c_padrao,
-            )
-            print(
-                f"partículas={n_particulas} níveis={n_niveis} "
-                f"passos={resultado['passos']} CPU={resultado['cpu_s']:.4f}s "
-                f"GPU={resultado['gpu_s']:.4f}s "
-                f"speedup={resultado['speedup']:.2f}x "
-                f"erro_max={resultado['erro_max_abs']:.3e} "
-                f"trajetória={resultado['trajetoria_MiB']:.2f} MiB"
-            )
-
-    print("\n=== 2/2: Estocasticidade para N = 1, 2, 3, 4 ===")
-    executar_teste_estocasticidade(
-        N_particulas=100,
-        t_max=1 / 5,
-        seed=42,
-        lista_N_fields=(1, 2, 3, 4),
-        backend_name="cuda",
-        output_dir=output_dir,
-    )
+    for n in range(1,21):
+    
+        executar_teste_estocasticidade_parametros(N_fields=n, temporal=True, lista_alpha = [(2.5)**(1/2)],t_max = 0.2, lista_c = [0.2, 0.4, 0.6, 0.8, 1.0], N_particulas= 10000, backend_name= "cuda")
 
     print("\nExecução concluída. Resultados salvos em 'resultados/'.")
 

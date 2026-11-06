@@ -81,6 +81,10 @@ def executar_teste_estocasticidade_parametros(
         Diretório onde os resultados, dados e figuras serão salvos.
     seed : int
         Semente inicial para reprodutibilidade.
+
+    Cada dados_ponto.npz inclui rs_final com forma
+    (num_amostras, N_particulas, 2), coordenadas (x, y), e seeds_amostras
+    na mesma ordem. Apenas os estados finais individuais são armazenados.
     """
 
     if output_dir is None:
@@ -168,6 +172,8 @@ def executar_teste_estocasticidade_parametros(
             amostras_mean = []
             amostras_var = []
             amostras_cov = []
+            posicoes_finais = np.empty((num_amostras, N_particulas, 2), dtype=float)
+            seeds_amostras = np.empty(num_amostras, dtype=np.int64)
 
             ts_ref = None
             stats_ref = None
@@ -176,6 +182,7 @@ def executar_teste_estocasticidade_parametros(
 
             for s_idx in range(num_amostras):
                 seed_amostra = seed + (idx_c * n_alpha + idx_a) * 100 + s_idx
+                seeds_amostras[s_idx] = seed_amostra
                 np.random.seed(seed_amostra)
 
                 ts, rs = it.simular_particulas(
@@ -192,6 +199,8 @@ def executar_teste_estocasticidade_parametros(
 
                 stats = calcular_estatisticas_trajetorias(ts, rs)
                 rs_final = rs[-1, :, :]
+                # Copia só o estado final, sem reter a trajetória de cada amostra.
+                posicoes_finais[s_idx] = rs_final
                 mean_f = np.mean(rs_final, axis=0)
                 var_f = np.var(rs_final, axis=0, ddof=1)
                 cov_f = np.cov(rs_final.T, ddof=1)
@@ -259,6 +268,8 @@ def executar_teste_estocasticidade_parametros(
                 mean_final=mean_final_ref,
                 var_final=var_final_ref,
                 cov_final=cov_final_ref,
+                rs_final=posicoes_finais,
+                seeds_amostras=seeds_amostras,
                 sigma2_final=sigma2_medio,
                 disp_media_final=disp_media,
                 norm_sigma2=norm_sigma2
